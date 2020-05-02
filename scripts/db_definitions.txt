@@ -1,0 +1,159 @@
+USE werewords;
+
+SET NAMES 'utf8';
+SET CHARACTER SET utf8;
+
+CREATE TABLE Words
+(
+  word_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  word VARCHAR(50) NOT NULL,
+  difficulty ENUM('easy', 'medium', 'hard', 'ridiculous') NOT NULL
+);
+ALTER TABLE Words CHARACTER SET utf8;
+
+CREATE TABLE Rooms
+(
+  room_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  room_name VARCHAR(50) NOT NULL,
+  expires DATETIME NOT NULL,
+  game_state ENUM('lobby', 'choosing', 'main', 'vote') NOT NULL,
+  difficulty ENUM('easy', 'medium', 'hard', 'ridiculous') NOT NULL DEFAULT 'medium',
+  timer_start DATETIME(0),
+  mayor INT,
+  secret INT,
+  secret_found BIT(1),
+  role_found BIT(1),
+  FOREIGN KEY (secret) REFERENCES Words(word_id)
+);
+
+CREATE TABLE Players
+(
+  player_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  room_id INT NOT NULL,
+  token VARCHAR(20) NOT NULL,
+  nickname VARCHAR(50) NOT NULL,
+  last_seen DATETIME NOT NULL,
+  role ENUM('werewolf', 'seer', 'villager', 'sage', 'freemason'),
+  vote INT,
+  FOREIGN KEY (vote) REFERENCES Players(player_id),
+  FOREIGN KEY (room_id) REFERENCES Rooms(room_id)
+);
+ALTER TABLE Rooms ADD FOREIGN KEY (mayor) REFERENCES Players(player_id);
+
+CREATE TABLE WordChoices
+(
+  room_id INT NOT NULL,
+  word_id INT NOT NULL,
+  FOREIGN KEY (room_id) REFERENCES Rooms(room_id),
+  FOREIGN KEY (word_id) REFERENCES Words(word_id)
+);
+
+delimiter //
+
+CREATE FUNCTION propose_name()
+RETURNS CHAR(10)
+BEGIN
+  DECLARE name CHAR(10);
+  SELECT CONCAT(word, "-", FLOOR(RAND() * 900 + 100)) INTO name FROM Words WHERE difficulty = "easy" AND LENGTH(word) =6 ORDER BY RAND() LIMIT 1;
+  RETURN name;
+END//
+
+CREATE FUNCTION request_room(name CHAR(50))
+RETURNS INT
+BEGIN
+  SELECT room_id INTO @room FROM Rooms WHERE room_name = name;
+  IF @room IS NULL THEN
+    INSERT INTO Rooms(room_name, expires, game_state)
+    VALUES (name, ADDDATE(NOW(), 1), "lobby");
+    SELECT LAST_INSERT_ID() INTO @room;
+  ELSE
+    UPDATE Rooms SET expires = ADDDATE(NOW(), 1) WHERE room_id = @room;
+  END IF;
+  CREATE TEMPORARY TABLE RoomsToDelete SELECT room_id FROM Rooms WHERE expires < NOW();
+  UPDATE Rooms INNER JOIN RoomsToDelete SET mayor = NULL;
+  DELETE P.* FROM RoomsToDelete INNER JOIN Players P;
+  DELETE W.* FROM RoomsToDelete INNER JOIN WordChoices W;
+  DELETE Rooms.* FROM RoomsToDelete INNER JOIN Rooms;
+  DROP TEMPORARY TABLE RoomsToDelete;
+  RETURN @room;
+END//
+
+CREATE PROCEDURE start_game(room_id_ INT)
+proc: BEGIN
+  SELECT game_state INTO @game_state FROM Rooms WHERE room_id = room_id_;
+  IF @game_state != "lobby" THEN
+    LEAVE proc;
+  END IF;
+  CREATE TEMPORARY TABLE PlayersInGame SELECT player_id FROM Players WHERE room_id = room_id_ AND last_seen > ADDTIME(NOW(), -12);
+  SELECT COUNT(1) FROM PlayersInGame INTO @num_players;
+  IF @num_players < 3 THEN
+    LEAVE proc;
+  END IF;  
+  # Assign roles
+  SELECT player_id INTO @mayor FROM PlayersInGame ORDER BY RAND() LIMIT 1;
+  SELECT player_id INTO @werewolf FROM PlayersInGame ORDER BY RAND() LIMIT 1;
+  SELECT player_id INTO @seer FROM PlayersInGame WHERE player_id != @werewolf ORDER BY RAND() LIMIT 1;
+  # Adjust player info
+  UPDATE Players SET vote = NULL WHERE room_id = room_id_;
+  UPDATE Players NATURAL JOIN PlayersInGame SET role = "villager";
+  UPDATE Players SET role = "werewolf" WHERE player_id = @werewolf;
+  UPDATE Players SET role = "seer" WHERE player_id = @seer;
+  DROP TEMPORARY TABLE PlayersInGame;
+  # Create list of words to choose from
+  SELECT difficulty + 0 INTO @diff FROM Rooms WHERE room_id = room_id_;
+  DELETE FROM WordChoices WHERE room_id = room_id_;
+  CREATE TEMPORARY TABLE ChoicesForThisGame SELECT word_id FROM Words WHERE difficulty = @diff ORDER BY RAND() LIMIT 3;
+  IF @mayor = @werewolf AND @diff < 4 THEN
+    INSERT INTO ChoicesForThisGame SELECT word_id FROM Words WHERE difficulty = @diff + 1 ORDER BY RAND() LIMIT 1;
+  ELSEIF @mayor = @seer AND @diff > 1 THEN
+    INSERT INTO ChoicesForThisGame SELECT word_id FROM Words WHERE difficulty = @diff - 1 ORDER BY RAND() LIMIT 1;
+  END IF;
+  INSERT INTO WordChoices(room_id, word_id) SELECT room_id_, word_id FROM ChoicesForThisGame ORDER BY RAND();
+  DROP TEMPORARY TABLE ChoicesForThisGame;
+  # Update room info
+  UPDATE Rooms SET game_state = "choosing", timer_start = NOW(), mayor = @mayor, secret_found = 0, role_found = 0, expires = ADDDATE(NOW(), 1) WHERE room_id = room_id_;
+END//
+
+CREATE PROCEDURE choose_word(room_id_ INT, word_index INT)
+proc: BEGIN
+  SELECT game_state INTO @game_state FROM Rooms WHERE room_id = room_id_;
+  IF @game_state != "choosing" THEN
+    LEAVE proc;
+  END IF;
+  SELECT word_id INTO @word_id FROM WordChoices WHERE room_id = room_id_ LIMIT word_index, 1;
+  UPDATE Rooms SET game_state = "main", timer_start = NOW(), secret = @word_id WHERE room_id = room_id_;
+END//
+
+CREATE PROCEDURE check_votes(room_id_ INT)
+proc: BEGIN
+  SELECT game_state, secret_found INTO @game_state, @secret_found FROM Rooms WHERE room_id = room_id_;
+  IF @game_state != "vote" THEN
+    LEAVE proc;
+  END IF;
+  SELECT COUNT(player_id) INTO @missing_votes FROM Players WHERE room_id = room_id_ AND role IS NOT NULL AND vote IS NULL AND (@secret_found = 0 OR role = "werewolf");
+  IF @missing_votes = 0 THEN
+    # There could be more than one winner of the vote, use a temporary table
+    CREATE TEMPORARY TABLE VotedPlayers SELECT vote, COUNT(vote) AS count FROM Players WHERE room_id = room_id_ GROUP BY vote HAVING count >= ALL(SELECT COUNT(vote) FROM Players GROUP BY vote) ORDER BY count DESC;
+    # Special case: every player received one vote -> werewolf wins
+    SELECT COUNT(1) INTO @num_players FROM Players WHERE room_id = room_id_ AND role IS NOT NULL;
+    SELECT COUNT(1) INTO @different_votes FROM VotedPlayers;
+    IF @num_players = @different_votes THEN
+      SET @role_found = 0;
+    ELSE
+      UPDATE Players SET vote = NULL WHERE room_id = room_id_;
+      # Use the vote column to indicate players that were voted for (use the player's own id)
+      UPDATE Players p INNER JOIN VotedPlayers v ON v.vote = player_id SET p.vote = player_id;
+      # Check vote result
+      IF @secret_found = 0 THEN
+        SET @target_role = "werewolf";
+      ELSE
+        SET @target_role = "seer";
+      END IF;
+      SELECT COUNT(1) INTO @role_found FROM Players WHERE role = @target_role AND player_id = vote AND room_id = room_id_ LIMIT 1;
+    END IF;
+    DROP TEMPORARY TABLE VotedPlayers;
+    UPDATE Rooms SET game_state = "lobby", role_found = @role_found WHERE room_id = room_id_;
+  END IF;
+END//
+
+delimiter ;
