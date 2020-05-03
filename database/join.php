@@ -1,26 +1,16 @@
 <?php
 $room_name = trim(@$_REQUEST["room_name"]);
-if (strlen($room_name) == 0)
-{
-    header("Location: welcome.php");
-    exit;
-}
 $nickname = trim(@$_REQUEST["nickname"]);
-if (strlen($nickname) == 0)
-{
-    header("Location: welcome.php?room_name=${room_name}");
-    exit;
-}
+if (!$room_name || !$nickname)
+    exit(json_encode(["error" => "Missing input"]));
 
 include 'mysql.php';
-if ($sql->connect_error)
-    die("ERROR: Could not connect to MySQL: " . $sql->connect_error);
 
 $room_id = request_room($room_name);
 $token = create_player($nickname, $room_id);
 $sql->close();
 
-header("Location: http://" . $_SERVER["SERVER_NAME"] . "/?token=$token");
+header("Location: ./?token=$token");
 exit;
 
 function sanitize($str, $max_len)
