@@ -18,7 +18,7 @@ if ($row == NULL)
     exit(json_encode(["error" => "Invalid request."]));
 list($player_id, $nickname, $role, $vote, $room_id, $room_name, $game_state, $mayor_id, $difficulty, $secret_found, $role_found, $seconds) = $row;
 $protocol = isset($_SERVER["HTTPS"]) ? "https://" : "http://";
-$link = $protocol . $_SERVER["HTTP_HOST"] . dirname($_SERVER["PHP_SELF"]) . "?room_name=$room_name";
+$link = $protocol . $_SERVER["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?room_name=$room_name";
 $is_mayor = $player_id == $mayor_id;
 $timeout = $game_state == "main" ? 4 * 60 : 60;
 $seconds_left = $timeout - (int)$seconds;
