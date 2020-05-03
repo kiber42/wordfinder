@@ -13,13 +13,20 @@ class App extends Component {
     this.timer = 0;
     this.state = {
       is_loaded: false,
-      error: ""
+      error: "",
+      token: this.props.token,
     }
   }
-    
+
+  enterRoom(room_name, player_token)
+  {
+    this.setState({token: player_token});
+    window.history.pushState({"token": player_token}, "Werewords " + room_name, "?token=" + player_token);
+  }
+
   render() {
-    if (!this.props.token)
-      return <Login room_name={this.props.room_name}/>
+    if (!this.state.token)
+      return <Login room_name={this.props.room_name} tokenAvailable={this.enterRoom.bind(this)}/>
     else if (this.state.is_loaded) {
       let items = (
         <div>
@@ -55,7 +62,7 @@ class App extends Component {
       return (
         <div>
           <div>Server meldet Fehler: {this.state.error}</div>
-          <div>Token used for request: {this.props.token}</div>
+          <div>Token used for request: {this.state.token}</div>
         </div>
       );
     return <div>...</div>
@@ -70,12 +77,12 @@ class App extends Component {
   }
 
   refresh() {
-    if (!this.props.token)
+    if (!this.state.token)
     {
       this.timer = setTimeout(this.refresh.bind(this), 200);
       return;
     }
-    fetch("state.php?token=" + this.props.token)
+    fetch("state.php?token=" + this.state.token)
     .then(result => result.json())
     .then(
       result => {

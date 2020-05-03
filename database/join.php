@@ -12,7 +12,7 @@ $room_id = request_room($room_name);
 $token = create_player($nickname, $room_id);
 $sql->close();
 
-exit(json_encode(["token" => $token]);
+exit(json_encode(["token" => $token]));
 
 function sanitize($str, $max_len)
 {
@@ -38,7 +38,6 @@ function create_player($nickname, $room_id)
     global $sql;
     $token = sanitize($nickname, 10) . random_int(100000, 999999);
     $nickname = sanitize($nickname, 50);
-    echo "INSERT INTO Players(nickname, token, room_id, last_seen) VALUES(\"$nickname\", \"$token\", $room_id, NOW())";
     if ($sql->query("INSERT INTO Players(nickname, token, room_id, last_seen) VALUES(\"$nickname\", \"$token\", $room_id, NOW())") === false)
         die("ERROR: SQL query failed in create_players");
     return $token;
