@@ -27,9 +27,9 @@ if (!$sql->query("UPDATE Players SET vote = $id WHERE token = \"$token\""))
     exit(json_encode(["error" => "Invalid request."]));
 
 $sql->commit();
-// Possible race condition here if there are multiple concurrent votes!
+// Possible race condition here if there are multiple concurrent votes?
 usleep(10000); // 10 ms
-$sql->query("CALL check_votes(${room_id})");
+$sql->query("CALL check_votes(${room_id}, 0)");
 $sql->close();
 
 echo json_encode(["error" => ""]);

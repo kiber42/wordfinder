@@ -124,20 +124,20 @@ proc: BEGIN
   UPDATE Rooms SET game_state = "main", timer_start = NOW(), secret = @word_id WHERE room_id = room_id_;
 END//
 
-CREATE PROCEDURE check_votes(room_id_ INT)
+CREATE PROCEDURE check_votes(room_id_ INT, time_up BIT(1))
 proc: BEGIN
   SELECT game_state, secret_found INTO @game_state, @secret_found FROM Rooms WHERE room_id = room_id_;
   IF @game_state != "vote" THEN
     LEAVE proc;
   END IF;
   SELECT COUNT(player_id) INTO @missing_votes FROM Players WHERE room_id = room_id_ AND role IS NOT NULL AND vote IS NULL AND (@secret_found = 0 OR role = "werewolf");
-  IF @missing_votes = 0 THEN
+  IF @time_up = 1 OR @missing_votes = 0 THEN
     # There could be more than one winner of the vote, use a temporary table
-    CREATE TEMPORARY TABLE VotedPlayers SELECT vote, COUNT(vote) AS count FROM Players WHERE room_id = room_id_ GROUP BY vote HAVING count >= ALL(SELECT COUNT(vote) FROM Players GROUP BY vote) ORDER BY count DESC;
-    # Special case: every player received one vote -> werewolf wins
-    SELECT COUNT(1) INTO @num_players FROM Players WHERE room_id = room_id_ AND role IS NOT NULL;
+    CREATE TEMPORARY TABLE VotedPlayers SELECT vote, COUNT(1) AS count FROM Players WHERE room_id = room_id_ AND vote IS NOT NULL GROUP BY vote HAVING count >= ALL(SELECT COUNT(vote) FROM Players GROUP BY vote) ORDER BY count DESC;
+    # Special case: every player received (at most) one vote -> werewolf wins
+    SELECT COUNT(1) INTO @num_votes FROM Players WHERE room_id = room_id_ AND role IS NOT NULL AND vote IS NOT NULL;
     SELECT COUNT(1) INTO @different_votes FROM VotedPlayers;
-    IF @num_players = @different_votes THEN
+    IF @num_votes = @different_votes THEN
       SET @role_found = 0;
     ELSE
       UPDATE Players SET vote = NULL WHERE room_id = room_id_;
@@ -152,7 +152,7 @@ proc: BEGIN
       SELECT COUNT(1) INTO @role_found FROM Players WHERE role = @target_role AND player_id = vote AND room_id = room_id_ LIMIT 1;
     END IF;
     DROP TEMPORARY TABLE VotedPlayers;
-    UPDATE Rooms SET game_state = "lobby", role_found = @role_found WHERE room_id = room_id_;
+    UPDATE Rooms SET game_state = "lobby", role_found = @role_found, timer_start = NULL WHERE room_id = room_id_;
   END IF;
 END//
 
