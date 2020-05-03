@@ -1,20 +1,24 @@
 #!/bin/bash
 target=${1:-$PWD/server}
-path_to_react_project=../react
-path_to_database_scripts=../database
 
-echo "Building React node project and copying output files to $target"
+SCRIPTDIR=$(cd `dirname $0` && pwd)
+path_to_react_project=$SCRIPTDIR/../react
+path_to_database_scripts=$SCRIPTDIR/../database
 
 mkdir -p $target
 if [ ! -d "$target" ]; then
-    echo "Could not create target directory."
+    echo "Could not create directory $target"
     exit 1
 fi;
+
+echo "Building React frontend project"
 
 pushd $path_to_react_project > /dev/null
 npm install
 npm run build
 popd > /dev/null
+
+echo "Copying frontend and database script files to $target"
 
 for item in index.html static res; do
     /bin/cp -r $path_to_react_project/build/$item $target
