@@ -95,7 +95,7 @@ proc: BEGIN
   SELECT player_id INTO @werewolf FROM PlayersInGame ORDER BY RAND() LIMIT 1;
   SELECT player_id INTO @seer FROM PlayersInGame WHERE player_id != @werewolf ORDER BY RAND() LIMIT 1;
   # Adjust player info
-  UPDATE Players SET vote = NULL WHERE room_id = room_id_;
+  UPDATE Players SET role = NULL, vote = NULL WHERE room_id = room_id_;
   UPDATE Players NATURAL JOIN PlayersInGame SET role = "villager";
   UPDATE Players SET role = "werewolf" WHERE player_id = @werewolf;
   UPDATE Players SET role = "seer" WHERE player_id = @seer;
