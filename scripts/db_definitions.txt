@@ -135,8 +135,8 @@ proc: BEGIN
   IF @time_up = 1 OR @missing_votes = 0 THEN
     # There could be more than one winner of the vote, use a temporary table
     CREATE TEMPORARY TABLE VotedPlayers SELECT vote, COUNT(1) AS count FROM Players WHERE room_id = room_id_ AND vote IS NOT NULL GROUP BY vote HAVING count >= ALL(SELECT COUNT(vote) FROM Players GROUP BY vote) ORDER BY count DESC;
-    # Special case: every player received (at most) one vote -> werewolf wins
-    SELECT COUNT(1) INTO @num_votes FROM Players WHERE room_id = room_id_ AND role IS NOT NULL AND vote IS NOT NULL;
+    # Special case: word not found, and every player received exactly one vote -> werewolf wins
+    SELECT COUNT(1) INTO @num_votes FROM Players WHERE room_id = room_id_ AND role IS NOT NULL;
     SELECT COUNT(1) INTO @different_votes FROM VotedPlayers;
     IF @num_votes = @different_votes THEN
       SET @role_found = 0;
