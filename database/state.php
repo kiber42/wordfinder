@@ -82,12 +82,12 @@ if ($game_state == "choosing")
 }
 else if (($game_state == "main" and ($is_mayor or $role != "villager")) or $game_state == "vote")
 {
-    $result = $sql->query("SELECT word FROM Words INNER JOIN Rooms WHERE word_id = secret AND room_id = ${room_id}");
+    $result = $sql->query("SELECT word FROM Words INNER JOIN Rooms WHERE word_id = secret AND room_id = ${room_id} LIMIT 1");
     $response["words"] = [$result->fetch_row()[0]];
     $result->close();
 }
 
-// Return recorded vote to each player
+// Report own recorded vote to each player
 if ($game_state == "vote" && $vote != null)
 {
     $result = $sql->query("SELECT nickname FROM Players WHERE player_id = $vote");
@@ -95,19 +95,23 @@ if ($game_state == "vote" && $vote != null)
     $result->close();
 }
     
-// Reveal werewolf?
-$show_result = $game_state == "lobby" && $secret_found != null;
-if ($show_result || ($game_state == "vote" && $secret_found == 1))
+// Reveal werewolf if word was found
+if ($game_state == "vote" && $secret_found == 1)
 {
     $result = $sql->query("SELECT nickname FROM Players WHERE role = \"werewolf\" AND room_id = ${room_id}");
     $response["werewolf_name"] = $result->fetch_row()[0];
     $result->close();
 }
-// Reveal seer (result phase only)
-if ($show_result)
+// Result phase, reveal special roles
+else if ($game_state == "lobby" && $secret_found != null)
 {
-    $result = $sql->query("SELECT nickname FROM Players WHERE role = \"seer\" AND room_id = ${room_id}");
-    $response["seer_name"] = $result->fetch_row()[0];
+    $result = $sql->query("SELECT role, nickname FROM Players WHERE role IS NOT NULL AND role != \"villager\" AND room_id = ${room_id}");
+    $rows = $result->fetch_all();
+    foreach ($rows as $row)
+    {
+        list($role_, $nickname_) = $row;
+        $response[$role_ . "_name"] = $nickname_;
+    }
     $result->close();
 }
 
