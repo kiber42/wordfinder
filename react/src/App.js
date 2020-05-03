@@ -5,7 +5,7 @@ import Login from './Login'
 
 import './App.css';
 
-const Connection = React.createContext({url: "", token: ""});
+const Connection = React.createContext({token: ""});
 
 class App extends Component {
   constructor(props) {
@@ -15,8 +15,6 @@ class App extends Component {
       is_loaded: false,
       error: ""
     }
-    const url = window.location.href;
-    this.baseUrl = url.substring(0, url.lastIndexOf('/')+1);
   }
     
   render() {
@@ -48,7 +46,7 @@ class App extends Component {
         items = <div>{items}<Invite link={this.state.join_link}/></div>;
 
       return (        
-        <Connection.Provider value={{url: this.baseUrl, token: this.props.token}}>
+        <Connection.Provider value={{token: this.state.token}}>
           {items}
         </Connection.Provider>
       );
@@ -77,7 +75,7 @@ class App extends Component {
       this.timer = setTimeout(this.refresh.bind(this), 200);
       return;
     }
-    fetch(this.baseUrl + "state.php?token=" + this.props.token)
+    fetch("state.php?token=" + this.props.token)
     .then(result => result.json())
     .then(
       result => {
@@ -219,11 +217,11 @@ class LobbyView extends Component {
   }
 
   startGame() {
-    fetch(this.context.url + "start_game.php?token=" + this.context.token).then().catch(err => console.error(err));
+    fetch("start.php?token=" + this.context.token).then().catch(err => console.error(err));
   }
 
   setDifficulty(level) {
-    fetch(this.context.url + "settings.php?token=" + this.context.token + "&difficulty=" + level).then().catch(err => console.error(err));
+    fetch("settings.php?token=" + this.context.token + "&difficulty=" + level).then().catch(err => console.error(err));
   }
 }
 
@@ -271,7 +269,7 @@ class WordChoice extends Component {
   }
 
   choose(index) {
-    fetch(this.context.url + "start_game.php?token=" + this.context.token + "&index=" + index).then().catch(err => console.error(err));
+    fetch("start.php?token=" + this.context.token + "&index=" + index).then().catch(err => console.error(err));
   }
 }
 
@@ -306,7 +304,7 @@ class MayorView extends Component {
   }
 
   secret_found() {
-    fetch(this.context.url + "/found.php?token=" + this.context.token).then().catch(err => console.error(err));
+    fetch("found.php?token=" + this.context.token).then().catch(err => console.error(err));
   }
 }
 
@@ -415,7 +413,7 @@ class Vote extends Component {
   }
 
   choose(index) {
-    fetch(this.context.url + "vote.php?token=" + this.context.token + "&id=" + index).then().catch(err => console.error(err));
+    fetch("vote.php?token=" + this.context.token + "&id=" + index).then().catch(err => console.error(err));
   }
 }
 
