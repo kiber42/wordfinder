@@ -1,13 +1,10 @@
 <?php
-header("Access-Control-Allow-Origin: *");
 header('Content-Type: application/json');
 
 if (!isset($_REQUEST["token"]) || !isset($_REQUEST["id"]))
     exit(json_encode(["error" => "Invalid request."]));
 
 include 'mysql.php';
-if ($sql->connect_error)
-    exit(json_encode(["error" => "Could not connect to database."]));
 
 $token = $sql->real_escape_string($_REQUEST["token"]);
 

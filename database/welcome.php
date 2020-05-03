@@ -4,8 +4,6 @@ header("Content-Type: text/html; charset=utf-8");
 function propose_name()
 {
     include 'mysql.php';
-    if ($sql->connect_error)
-        die("ERROR: Could not connect to MySQL: " . $sql->connect_error);
     $result = $sql->query("SELECT propose_name();");
     $name = $result->fetch_row()[0];
     $sql->close();
