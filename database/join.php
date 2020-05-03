@@ -1,4 +1,6 @@
 <?php
+header('Content-Type: application/json');
+
 $room_name = trim(@$_REQUEST["room_name"]);
 $nickname = trim(@$_REQUEST["nickname"]);
 if (!$room_name || !$nickname)
@@ -10,8 +12,7 @@ $room_id = request_room($room_name);
 $token = create_player($nickname, $room_id);
 $sql->close();
 
-header("Location: ./?token=$token");
-exit;
+exit(json_encode(["token" => $token]);
 
 function sanitize($str, $max_len)
 {
