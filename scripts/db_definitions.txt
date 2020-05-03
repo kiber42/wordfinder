@@ -70,10 +70,11 @@ BEGIN
     UPDATE Rooms SET expires = ADDDATE(NOW(), 1) WHERE room_id = @room;
   END IF;
   CREATE TEMPORARY TABLE RoomsToDelete SELECT room_id FROM Rooms WHERE expires < NOW();
-  UPDATE Rooms INNER JOIN RoomsToDelete SET mayor = NULL;
-  DELETE P.* FROM RoomsToDelete INNER JOIN Players P;
-  DELETE W.* FROM RoomsToDelete INNER JOIN WordChoices W;
-  DELETE Rooms.* FROM RoomsToDelete INNER JOIN Rooms;
+  SET FOREIGN_KEY_CHECKS = 0;
+  DELETE P.* FROM RoomsToDelete NATURAL JOIN Players P;
+  DELETE W.* FROM RoomsToDelete NATURAL JOIN WordChoices W;
+  DELETE Rooms.* FROM RoomsToDelete NATURAL JOIN Rooms;
+  SET FOREIGN_KEY_CHECKS = 1;
   DROP TEMPORARY TABLE RoomsToDelete;
   RETURN @room;
 END//
