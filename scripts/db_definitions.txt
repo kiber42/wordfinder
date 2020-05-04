@@ -1,4 +1,4 @@
-USE werewords;
+USE [insert-database-name-here];
 
 SET NAMES 'utf8';
 SET CHARACTER SET utf8;
@@ -25,6 +25,7 @@ CREATE TABLE Rooms
   role_found BIT(1),
   FOREIGN KEY (secret) REFERENCES Words(word_id)
 );
+ALTER TABLE Rooms CHARACTER SET utf8;
 
 CREATE TABLE Players
 (
@@ -38,6 +39,7 @@ CREATE TABLE Players
   FOREIGN KEY (vote) REFERENCES Players(player_id),
   FOREIGN KEY (room_id) REFERENCES Rooms(room_id)
 );
+ALTER TABLE Players CHARACTER SET utf8;
 ALTER TABLE Rooms ADD FOREIGN KEY (mayor) REFERENCES Players(player_id);
 
 CREATE TABLE WordChoices
