@@ -44,7 +44,7 @@ CREATE TABLE WordChoices
   FOREIGN KEY (word_id) REFERENCES Words(word_id)
 );
 
-delimiter //
+DELIMITER //
 
 CREATE FUNCTION propose_name()
 RETURNS CHAR(10)
@@ -129,28 +129,31 @@ proc: BEGIN
   END IF;
   SELECT COUNT(player_id) INTO @missing_votes FROM Players WHERE room_id = room_id_ AND role IS NOT NULL AND vote IS NULL AND (@secret_found = 0 OR role = "werewolf");
   IF @time_up = 1 OR @missing_votes = 0 THEN
-    # There could be more than one winner of the vote, use a temporary table
-    CREATE TEMPORARY TABLE VotedPlayers SELECT vote, COUNT(1) AS count FROM Players WHERE room_id = room_id_ AND vote IS NOT NULL GROUP BY vote HAVING count >= ALL(SELECT COUNT(vote) FROM Players GROUP BY vote) ORDER BY count DESC;
-    # Special case: word not found, and every player received exactly one vote -> werewolf wins
-    SELECT COUNT(1) INTO @num_votes FROM Players WHERE room_id = room_id_ AND role IS NOT NULL;
-    SELECT COUNT(1) INTO @different_votes FROM VotedPlayers;
-    IF @num_votes = @different_votes THEN
-      SET @role_found = 0;
-    ELSE
-      UPDATE Players SET vote = NULL WHERE room_id = room_id_;
-      # Use the vote column to indicate players that were voted for (use the player's own id)
-      UPDATE Players p INNER JOIN VotedPlayers v ON v.vote = player_id SET p.vote = player_id;
-      # Check vote result
+    # Determine highest vote count
+    SELECT MAX(subquery.result) INTO @max_count FROM (SELECT COUNT(vote) AS result FROM Players P WHERE room_id = room_id_ GROUP BY vote) subquery;
+    # There could be more than one winner of the vote, store in a temporary table
+  CREATE TEMPORARY TABLE VotedPlayers SELECT vote, COUNT(1) AS count FROM Players WHERE room_id = room_id_ AND vote IS NOT NULL GROUP BY vote HAVING count = @max_count;
+  SET @role_found = -1;
+  IF @secret_found = 0 THEN
+      # Handle special case: every player received exactly one vote -> werewolf wins automatically
+      SELECT COUNT(1) INTO @num_votes FROM Players WHERE room_id = room_id_ AND role IS NOT NULL;
+      SELECT COUNT(1) INTO @different_votes FROM VotedPlayers;
+      IF @num_votes = @different_votes THEN
+        SET @role_found = 0;
+    END IF;
+  END IF;
+    IF @role_found = -1 THEN
+      # Check vote result.  Use numerical enum values, this avoids issues with character encoding.
       IF @secret_found = 0 THEN
-        SET @target_role = "werewolf";
+        SET @target_role = 1; # werewolf
       ELSE
-        SET @target_role = "seer";
+        SET @target_role = 2; # seer
       END IF;
-      SELECT COUNT(1) INTO @role_found FROM Players WHERE role = @target_role AND player_id = vote AND room_id = room_id_ LIMIT 1;
+      SELECT COUNT(1) INTO @role_found FROM Players p INNER JOIN VotedPlayers v ON v.vote = player_id WHERE role = @target_role LIMIT 1;
     END IF;
     DROP TEMPORARY TABLE VotedPlayers;
     UPDATE Rooms SET game_state = "lobby", role_found = @role_found, timer_start = NULL WHERE room_id = room_id_;
   END IF;
 END//
 
-delimiter ;
+DELIMITER ;
