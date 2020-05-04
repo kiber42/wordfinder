@@ -1,20 +1,16 @@
 USE [insert-database-name-here];
 
-SET NAMES 'utf8';
-SET CHARACTER SET utf8;
-
 CREATE TABLE Words
 (
   word_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  word VARCHAR(50) NOT NULL,
+  word VARCHAR(50) CHARACTER SET utf8mb4 NOT NULL,
   difficulty ENUM('easy', 'medium', 'hard', 'ridiculous') NOT NULL
 );
-ALTER TABLE Words CHARACTER SET utf8;
 
 CREATE TABLE Rooms
 (
   room_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  room_name VARCHAR(50) NOT NULL,
+  room_name VARCHAR(50) CHARACTER SET utf8mb4 NOT NULL,
   expires DATETIME NOT NULL,
   game_state ENUM('lobby', 'choosing', 'main', 'vote') NOT NULL,
   difficulty ENUM('easy', 'medium', 'hard', 'ridiculous') NOT NULL DEFAULT 'medium',
@@ -25,21 +21,19 @@ CREATE TABLE Rooms
   role_found BIT(1),
   FOREIGN KEY (secret) REFERENCES Words(word_id)
 );
-ALTER TABLE Rooms CHARACTER SET utf8;
 
 CREATE TABLE Players
 (
   player_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   room_id INT NOT NULL,
-  token VARCHAR(20) NOT NULL,
-  nickname VARCHAR(50) NOT NULL,
+  token VARCHAR(20) CHARACTER SET utf8mb4 NOT NULL,
+  nickname VARCHAR(50) CHARACTER SET utf8mb4 NOT NULL,
   last_seen DATETIME NOT NULL,
   role ENUM('werewolf', 'seer', 'villager', 'sage', 'freemason'),
   vote INT,
   FOREIGN KEY (vote) REFERENCES Players(player_id),
   FOREIGN KEY (room_id) REFERENCES Rooms(room_id)
 );
-ALTER TABLE Players CHARACTER SET utf8;
 ALTER TABLE Rooms ADD FOREIGN KEY (mayor) REFERENCES Players(player_id);
 
 CREATE TABLE WordChoices
