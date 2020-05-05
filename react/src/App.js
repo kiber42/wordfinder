@@ -10,9 +10,11 @@ const Connection = React.createContext({token: ""});
 class App extends Component {
   constructor(props) {
     super(props);
-    this.timer = 0;
+    this.refresh_timer = 0;
+    this.timeout_timer = 0;
     this.state = {
-      is_loaded: false,
+      is_valid: false,
+      connected: false,
       error: "",
       token: this.props.token,
     }
@@ -27,9 +29,9 @@ class App extends Component {
   render() {
     if (!this.state.token)
       return <Login room_name={this.props.room_name} tokenAvailable={this.enterRoom.bind(this)}/>
-    else if (this.state.is_loaded) {
-      let items = (
-        <div>
+
+    if (this.state.is_valid) {
+      let items = <>
           <Welcome name={this.state.nickname} room={this.state.room_name}/>
           <Teammates active={this.state.players} waiting={this.state.players_waiting}/>
           <GameView state={this.state.game_state}
@@ -47,25 +49,23 @@ class App extends Component {
                     players={this.state.players}
                     num_players={this.state.players.length + 1}
                     seconds_left={this.state.seconds_left}/>
-        </div>
-      );
+      </>
       if (this.state.game_state === "lobby")
-        items = <div>{items}<Invite link={this.state.join_link}/></div>;
+        items = <>{items}<Invite link={this.state.join_link}/></>
+      if (!this.state.connected)
+        items = <>{items}<div>No connection to server!</div></>
 
-      return (        
+      return (
         <Connection.Provider value={{token: this.state.token}}>
           {items}
         </Connection.Provider>
       );
     }
-    else if (this.state.error)
-      return (
-        <div>
-          <div>Server meldet Fehler: {this.state.error}</div>
-          <div>Token used for request: {this.state.token}</div>
-        </div>
-      );
-    return <div>...</div>
+
+    if (this.state.error)
+      return <div>Server meldet Fehler: {this.state.error}</div>
+
+    return <div>Waiting for server response...</div>
   }
 
   componentDidMount() {
@@ -73,23 +73,31 @@ class App extends Component {
   }
 
   componentWillUnmount() {
-    clearTimeout(this.timer);
+    clearTimeout(this.refresh_timer);
   }
 
   refresh() {
     if (!this.state.token)
     {
-      this.timer = setTimeout(this.refresh.bind(this), 200);
+      // User did not join a room yet, do not request state
+      this.refresh_timer = setTimeout(this.refresh.bind(this), 200);
       return;
     }
+
+    this.timeout_timer = setTimeout(() => this.setState({connected : false}), 5000);
     fetch("state.php?token=" + this.state.token)
     .then(result => result.json())
+    .catch((err) => {
+      this.refresh_timer = setTimeout(this.refresh.bind(this), 2000);
+      throw new Error("Could not reach server");
+    })
     .then(
       result => {
         if (!result.error)
         {
-          // Explicitly list possible items, since not all will be set at each
-          // stage and it is important to set missing items to undefined.
+          // Not all of the possible items will be sent by state.php in each
+          // state of the game.  It is important to set missing items to
+          // undefined, to avoid presenting outdated values.
           this.setState({
             nickname: result.nickname,
             room_name: result.room_name,
@@ -108,15 +116,23 @@ class App extends Component {
             role_found: result.role_found,
             seconds_left: result.seconds_left,
             join_link: result.join_link,
-            is_loaded: true,
+            is_valid: true,
+            connected: true,
           });
+          clearTimeout(this.timeout_timer);
+          const refresh_delay = this.state.game_state === "main" ? 2000 : 500;
+          this.refresh_timer = setTimeout(this.refresh.bind(this), refresh_delay);
         }
         else
-          this.setState({is_loaded: false, error: result.error});
+        {
+          this.setState({is_valid: false, error: result.error});
+          if (result.error === "Invalid token.")
+            this.setState({token: null});
+          else
+            this.setTimeout(this.refresh.bind(this), 3000);
+        }
       })
     .catch(err => console.error(err));
-    const timeout = this.state.game_state === "main" ? 2000 : 500;
-    this.timer = setTimeout(this.refresh.bind(this), timeout);
   }
 }
 
