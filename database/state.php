@@ -12,20 +12,17 @@ $token = $sql->real_escape_string($_REQUEST["token"]);
 $result = $sql->query("SELECT player_id, nickname, role, vote, p.room_id, room_name, game_state, mayor, difficulty - 1, secret_found, role_found, TIME_TO_SEC(TIMEDIFF(NOW(), timer_start)) FROM Players p NATURAL JOIN Rooms WHERE token = \"$token\"");
 $row = $result->fetch_row();
 if ($row == NULL)
-    exit(json_encode(["error" => "Invalid request."]));
+    exit(json_encode(["error" => "Invalid token."]));
 list($player_id, $nickname, $role, $vote, $room_id, $room_name, $game_state, $mayor_id, $difficulty, $secret_found, $role_found, $seconds) = $row;
 $protocol = isset($_SERVER["HTTPS"]) ? "https://" : "http://";
 $link = $protocol . $_SERVER["HTTP_HOST"] . dirname($_SERVER["PHP_SELF"]) . "/?room_name=$room_name";
 $is_mayor = $player_id == $mayor_id;
-$timeout = $game_state == "main" ? 4 * 60 : 60;
-$seconds_left = $timeout - (int)$seconds;
 $response = ["nickname" => htmlspecialchars($nickname),
              "room_name" => htmlspecialchars($room_name),
              "game_state" => $game_state,
              "difficulty" => (int)$difficulty,
              "player_role" => $role,
              "is_mayor" => $is_mayor,
-             "seconds_left" => $seconds_left,
              "join_link" => $link];
 $result->close();
 
@@ -112,13 +109,19 @@ else if ($game_state == "lobby" && $secret_found != null)
     $result->close();
 }
 
-// Guessing has timed out
-if ($seconds_left <= 0)
+// Report time remaining and check for time-out
+if ($game_state != "lobby")
 {
-    switch ($game_state) {
-    case "choosing": $sql->query("CALL choose_word(${room_id}, 0)"); break;
-    case "main": $sql->query("UPDATE Rooms SET game_state = \"vote\", secret_found = 0, timer_start = NOW() WHERE room_id = ${room_id}"); break;
-    case "vote": $sql->query("CALL check_votes(${room_id}, 1)"); break;
+    $timeout = $game_state == "main" ? 4 * 60 : 60;
+    $seconds_left = $timeout - (int)$seconds;
+    $response["seconds_left"] = $seconds_left;
+    if ($seconds_left <= 0)
+    {
+        switch ($game_state) {
+        case "choosing": $sql->query("CALL choose_word(${room_id}, 0)"); break;
+        case "main": $sql->query("UPDATE Rooms SET game_state = \"vote\", secret_found = 0, timer_start = NOW() WHERE room_id = ${room_id}"); break;
+        case "vote": $sql->query("CALL check_votes(${room_id}, 1)"); break;
+        }
     }
 }
 
