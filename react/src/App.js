@@ -271,7 +271,7 @@ class SecretRole extends Component {
       case "seer": role = "Seherin"; break;
       case "villager": default: role = "Dorfbewohner"; break;
     }
-    return <div>Deine geheime Rolle: {role}</div>
+    return <div>Deine geheime Rolle: <b>{role}</b></div>
   }
 }
 
