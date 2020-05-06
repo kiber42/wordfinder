@@ -46,6 +46,7 @@ class App extends Component {
                     werewolf_name={this.state.werewolf_name}
                     seer_name={this.state.seer_name}
                     voted_name={this.state.voted_name}
+                    received_votes={this.state.received_votes}
                     players={this.state.players}
                     num_players={this.state.players.length + 1}
                     seconds_left={this.state.seconds_left}/>
@@ -114,6 +115,7 @@ class App extends Component {
             werewolf_name: result.werewolf_name,
             seer_name: result.seer_name,
             role_found: result.role_found,
+            received_votes: result.received_votes_from,
             seconds_left: result.seconds_left,
             join_link: result.join_link,
             is_valid: true,
@@ -149,7 +151,7 @@ class GameView extends Component {
           const winner = (this.props.secret_found + this.props.role_found) === 1 ? "villagers" : "werewolf";
           return (
             <div>
-              <ResultView winner={winner} werewolf_name={this.props.werewolf_name} seer_name={this.props.seer_name}/>
+              <ResultView winner={winner} werewolf_name={this.props.werewolf_name} seer_name={this.props.seer_name} received_votes={this.props.received_votes}/>
               <LobbyView num_players={this.props.num_players} difficulty={this.props.difficulty}/>
             </div>
           );
@@ -448,17 +450,34 @@ class ResultView extends Component {
     else
       winner = (
         <div>
-          <div>Die Dorfbewohner haben gewonnen!</div>
           <div><b>{this.props.werewolf_name}</b> war der Werwolf.</div>
+          <div>Die Dorfbewohner haben gewonnen!</div>
         </div>
         );
     return (
       <div>
         <div>Die Runde ist zu Ende:</div>
-        {winner}
+        <VoteResults received_votes={this.props.received_votes}/>
         <div><b>{this.props.seer_name}</b> war die Seherin.</div>
+        {winner}
       </div>
     );
+  }
+}
+
+class VoteResults extends Component {
+  render() {
+    function prettyJoin(items) {
+      return items.slice(0, -1).join(", ") + " und " + items.slice(-1);
+    }
+
+    const list = Object.keys(this.props.received_votes).map((vote_recipient, index) => {
+      const voters = this.props.received_votes[vote_recipient];
+      if (voters.length < 2)
+        return <li key={index}>{voters[0]} stimmte für <b>{vote_recipient}</b></li>
+      return <li key={index}>{prettyJoin(voters)} stimmten für <b>{vote_recipient}</b></li>
+    });
+    return <ul>{list}</ul>
   }
 }
 

@@ -96,7 +96,7 @@ if ($game_state == "vote" && $secret_found == 1)
     $response["werewolf_name"] = $result->fetch_row()[0];
     $result->close();
 }
-// Result phase, reveal special roles
+// Result phase: reveal special roles and votes
 else if ($game_state == "lobby" && $secret_found != null)
 {
     $result = $sql->query("SELECT role, nickname FROM Players WHERE role IS NOT NULL AND role != \"villager\" AND room_id = ${room_id}");
@@ -106,6 +106,15 @@ else if ($game_state == "lobby" && $secret_found != null)
         list($role_, $nickname_) = $row;
         $response[$role_ . "_name"] = $nickname_;
     }
+    $result->close();
+
+    $result = $sql->query("SELECT p1.nickname, p2.nickname FROM Players p1 INNER JOIN Players p2 ON p1.vote = p2.player_id WHERE p1.vote IS NOT NULL AND p1.room_id = ${room_id}");
+    $rows = $result->fetch_all();
+    $received_votes = [];
+    foreach ($rows as $row) { $received_votes[$row[1]] = []; }
+    foreach ($rows as $row) { $received_votes[$row[1]][] = $row[0]; }
+    uasort($received_votes, function ($a, $b) { return count($b) - count($a); });
+    $response["received_votes_from"] = $received_votes;
     $result->close();
 }
 
