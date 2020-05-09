@@ -50,7 +50,7 @@ CREATE FUNCTION propose_name()
 RETURNS CHAR(10)
 BEGIN
   DECLARE name CHAR(10);
-  SELECT CONCAT(word, "-", FLOOR(RAND() * 900 + 100)) INTO name FROM Words WHERE difficulty = "easy" AND LENGTH(word) =6 ORDER BY RAND() LIMIT 1;
+  SELECT CONCAT(word, "-", FLOOR(RAND() * 900 + 100)) INTO name FROM Words WHERE difficulty = "easy" AND LENGTH(word) = 6 ORDER BY RAND() LIMIT 1;
   RETURN name;
 END//
 
@@ -171,16 +171,16 @@ proc: BEGIN
     # Determine highest vote count
     SELECT MAX(subquery.result) INTO @max_count FROM (SELECT COUNT(vote) AS result FROM Players P WHERE room_id = room_id_ GROUP BY vote) subquery;
     # There could be more than one winner of the vote, store in a temporary table
-  CREATE TEMPORARY TABLE VotedPlayers SELECT vote, COUNT(1) AS count FROM Players WHERE room_id = room_id_ AND vote IS NOT NULL GROUP BY vote HAVING count = @max_count;
-  SET @role_found = -1;
-  IF @secret_found = 0 THEN
+    CREATE TEMPORARY TABLE VotedPlayers SELECT vote, COUNT(1) AS count FROM Players WHERE room_id = room_id_ AND vote IS NOT NULL GROUP BY vote HAVING count = @max_count;
+    SET @role_found = -1;
+    IF @secret_found = 0 THEN
       # Handle special case: every player received exactly one vote -> werewolf wins automatically
       SELECT COUNT(1) INTO @num_votes FROM Players WHERE room_id = room_id_ AND role IS NOT NULL;
       SELECT COUNT(1) INTO @different_votes FROM VotedPlayers;
       IF @num_votes = @different_votes THEN
         SET @role_found = 0;
+      END IF;
     END IF;
-  END IF;
     IF @role_found = -1 THEN
       # Check vote result.  Use numerical enum values, this avoids issues with character encoding.
       IF @secret_found = 0 THEN
