@@ -1,19 +1,20 @@
 <?php
 header('Content-Type: application/json');
-
-if (!isset($_REQUEST["token"]))
-    exit(json_encode(["error" => "Invalid request."]));
-
 include 'mysql.php';
 
-$token = $sql->real_escape_string($_REQUEST["token"]);
-
-// Retrieve information about player and game
-$result = $sql->query("SELECT player_id, nickname, role, vote, p.room_id, room_name, game_state, mayor, difficulty - 1, secret_found, role_found, TIME_TO_SEC(TIMEDIFF(NOW(), timer_start)) FROM Players p NATURAL JOIN Rooms WHERE token = \"$token\"");
-$row = $result->fetch_row();
-if ($row == NULL)
+// Retrieve information about player and game state
+$query_str =
+    "SELECT player_id, nickname, role, vote, p.room_id, room_name, game_state, mayor, difficulty - 1, " .
+    "secret_found, role_found, TIME_TO_SEC(TIMEDIFF(NOW(), timer_start)) FROM Players p NATURAL JOIN Rooms WHERE token = ?";
+$token = @$_REQUEST['token'];
+$success = ($stmt = $sql->prepare($query_str)) && $stmt->bind_param('s', $token) && $stmt->execute() &&
+    ($result = $stmt->get_result()) && ($row = $result->fetch_row());
+if (!$success)
     exit(json_encode(["error" => "Invalid token."]));
+$stmt->close();
+
 list($player_id, $nickname, $role, $vote, $room_id, $room_name, $game_state, $mayor_id, $difficulty, $secret_found, $role_found, $seconds) = $row;
+
 $protocol = isset($_SERVER["HTTPS"]) ? "https://" : "http://";
 $link = $protocol . $_SERVER["HTTP_HOST"] . dirname($_SERVER["PHP_SELF"]) . "/?room_name=$room_name";
 $is_mayor = $player_id == $mayor_id;
@@ -24,9 +25,8 @@ $response = ["nickname" => htmlspecialchars($nickname),
              "player_role" => $role,
              "is_mayor" => $is_mayor,
              "join_link" => $link];
-$result->close();
 
-if ($secret_found != null)
+if ($secret_found !== null)
 {
     $response["secret_found"] = (int)$secret_found;
     $response["role_found"] = (int)$role_found;
@@ -92,14 +92,14 @@ if ($game_state == "vote" && $vote != null)
 // Reveal werewolf if word was found
 if ($game_state == "vote" && $secret_found == 1)
 {
-    $result = $sql->query("SELECT nickname FROM Players WHERE role = \"werewolf\" AND room_id = ${room_id}");
+    $result = $sql->query("SELECT nickname FROM Players WHERE role = 'werewolf' AND room_id = ${room_id}");
     $response["werewolf_name"] = $result->fetch_row()[0];
     $result->close();
 }
 // Result phase: reveal special roles and votes
-else if ($game_state == "lobby" && $secret_found != null)
+else if ($game_state == "lobby" && $secret_found !== null)
 {
-    $result = $sql->query("SELECT role, nickname FROM Players WHERE role IS NOT NULL AND role != \"villager\" AND room_id = ${room_id}");
+    $result = $sql->query("SELECT role, nickname FROM Players WHERE role IS NOT NULL AND role != 'villager' AND room_id = ${room_id}");
     $rows = $result->fetch_all();
     foreach ($rows as $row)
     {
@@ -121,14 +121,14 @@ else if ($game_state == "lobby" && $secret_found != null)
 // Report time remaining and check for time-out
 if ($game_state != "lobby")
 {
-    $timeout = $game_state == "main" ? 4 * 60 : 60;
+    $timeout = $game_state == "main" ? 4 : 60;
     $seconds_left = $timeout - (int)$seconds;
     $response["seconds_left"] = $seconds_left;
     if ($seconds_left <= 0)
     {
         switch ($game_state) {
         case "choosing": $sql->query("CALL choose_word(${room_id}, 0)"); break;
-        case "main": $sql->query("UPDATE Rooms SET game_state = \"vote\", secret_found = 0, timer_start = NOW() WHERE room_id = ${room_id}"); break;
+        case "main": $sql->query("UPDATE Rooms SET game_state = 'vote', secret_found = 0, timer_start = NOW() WHERE room_id = ${room_id}"); break;
         case "vote": $sql->query("CALL check_votes(${room_id}, 1)"); break;
         }
     }

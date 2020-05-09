@@ -1,27 +1,28 @@
 <?php
 header('Content-Type: application/json');
-
-if (!isset($_REQUEST["token"]) || !isset($_REQUEST["id"]))
-    exit(json_encode(["error" => "Invalid request."]));
-
 include 'mysql.php';
 
-$token = $sql->real_escape_string($_REQUEST["token"]);
+if (!isset($_REQUEST['id']))
+    exit(json_encode(["error" => "Incomplete request."]));
+$vote_id = $_REQUEST['id'];
 
 // Retrieve information about player and game
-$result = $sql->query("SELECT role, game_state, secret_found, vote, p.room_id FROM Players p NATURAL JOIN Rooms WHERE token = \"$token\"");
-$row = $result->fetch_row();
-if ($row == NULL)
-    exit(json_encode(["error" => "Invalid request."]));
+$query_str = "SELECT role, game_state, secret_found, vote, p.room_id FROM Players p NATURAL JOIN Rooms WHERE token = ?";
+$token = @$_REQUEST['token'];
+$success = ($stmt = $sql->prepare($query_str)) && $stmt->bind_param('s', $token) && $stmt->execute() &&
+    ($result = $stmt->get_result()) && ($row = $result->fetch_row());
+if (!$success)
+    exit(json_encode(["error" => "Invalid token."]));
 list($role, $game_state, $secret_found, $vote, $room_id) = $row;
-$result->close();
+$stmt->close();
 
 if ($game_state != "vote" || $vote != null || ($secret_found == true && $role != "werewolf"))
-    exit(json_encode(["error" => "Invalid request."]));
+    exit(json_encode(["error" => "Voting not possible."]));
 
-$id = (int)($_REQUEST["id"]);
-if (!$sql->query("UPDATE Players SET vote = $id WHERE token = \"$token\""))
-    exit(json_encode(["error" => "Invalid request."]));
+$query_str = "UPDATE Players SET vote = ? WHERE token = ?";
+$success = ($stmt = $sql->prepare($query_str)) && $stmt->bind_param('is', $vote_id, $token) && $stmt->execute();
+if (!$success || $sql->affected_rows != 1)
+    exit(json_encode(["error" => "Failed to count vote."]));
 
 $sql->commit();
 // Possible race condition here if there are multiple concurrent votes?
