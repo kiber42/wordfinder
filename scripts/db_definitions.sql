@@ -163,7 +163,7 @@ proc: BEGIN
     LEAVE proc;
   END IF;
   SELECT COUNT(player_id) INTO @missing_votes FROM Players WHERE room_id = room_id_ AND role IS NOT NULL AND vote IS NULL AND (@secret_found = 0 OR role = "werewolf");
-  IF @time_up = 1 OR @missing_votes = 0 THEN
+  IF time_up = 1 OR @missing_votes = 0 THEN
     # Determine highest vote count
     SELECT MAX(subquery.result) INTO @max_count FROM (SELECT COUNT(vote) AS result FROM Players P WHERE room_id = room_id_ GROUP BY vote) subquery;
     # There could be more than one winner of the vote, store in a temporary table
