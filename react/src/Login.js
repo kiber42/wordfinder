@@ -3,19 +3,21 @@ import React from 'react';
 class Login extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {room_name: this.props.room_name ?? "", nickname: ""};
+    this.state = {room_name: this.props.room_name ?? "", nickname: "", message: null};
     if (!this.props.room_name)
       this.getNameSuggestion();
 
     this.roomChanged = (event) => this.setState({room_name: event.target.value});
-    this.nameChanged = (event) => this.setState({nickname: event.target.value});
+    this.nameChanged = (event) => this.setState({nickname: event.target.value, message: null});
     this.handleSubmit = (event) => {
       if (!!this.state.room_name && !!this.state.nickname)
       {
+        this.setState({message: null});
         fetch("join.php?room_name=" + this.state.room_name + "&nickname=" + this.state.nickname)
         .then(res => res.json())
         .then(res => {
           if (!!res.token) this.props.tokenAvailable(this.state.room_name, res.token);
+          else if (res.token === 0) this.setState({message: "Dieser Name ist bereits vergeben."});
         })
         .catch(err => console.error(err));
       }
@@ -44,6 +46,11 @@ class Login extends React.Component {
           <td><label htmlFor="nickname">Spielername:</label></td>
           <td><input id="nickname" type="text" maxLength="50" value={this.state.nickname} onChange={this.nameChanged}/></td>
         </tr>
+        {this.state.message && (
+          <tr>
+            <td colSpan="2">{this.state.message}</td>
+          </tr>
+        )}
         <tr><td colSpan="2"><input type="submit" value="Go"/></td></tr>
       </tbody>
       </table>

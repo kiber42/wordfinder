@@ -83,6 +83,17 @@ END//
 CREATE FUNCTION add_player(name CHAR(50), room_id_ INT)
 RETURNS INT
 BEGIN
+  # Check if name is taken
+  SET @token = 0;
+  SELECT token, last_seen < ADDTIME(NOW(), -10) AS expired INTO @token, @expired FROM Players WHERE nickname = name AND room_id = room_id_;
+  # Permit using name again if it is not currently active; possible even during game
+  IF @token > 0 THEN
+    IF @expired THEN
+      RETURN @token;
+    END IF;
+    RETURN 0;
+  END IF;
+  # Find unique token that cannot be predicted
   REPEAT
     SELECT FLOOR(RAND() * 900000000 + 100000000) INTO @token;
     SELECT COUNT(1) INTO @found FROM Players WHERE token = @token;
