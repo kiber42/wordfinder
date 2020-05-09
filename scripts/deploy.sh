@@ -14,7 +14,10 @@ fi;
 echo "Building React frontend project"
 
 pushd $path_to_react_project > /dev/null
-npm install
+# Provide an arbitary extra command line argument to skip npm install
+if [[ $# -le 1 ]]; then
+    npm install
+fi
 npm run build
 popd > /dev/null
 
