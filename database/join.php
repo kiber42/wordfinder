@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 $room_name = trim(@$_REQUEST['room_name']);
 $nickname = trim(@$_REQUEST['nickname']);
 if (!$room_name || !$nickname)
-    exit(json_encode(["error" => "Missing input"]));
+    exit(json_encode(["error" => "Missing input."]));
 
 include 'mysql.php';
 
