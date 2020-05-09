@@ -37,12 +37,12 @@ class Login extends React.Component {
       <table>
       <tbody>
         <tr>
-          <td><label htmlFor="room_name">Room name:</label></td>
+          <td><label htmlFor="room_name">Name des Raums:</label></td>
           <td><input id="room_name" type="text" value={this.state.room_name} onChange={this.roomChanged}/></td>
         </tr>
         <tr>
-          <td><label htmlFor="nickname">Your nickname:</label></td>
-          <td><input id="nickname" type="text" maxLength="25" value={this.state.nickname} onChange={this.nameChanged}/></td>
+          <td><label htmlFor="nickname">Spielername:</label></td>
+          <td><input id="nickname" type="text" maxLength="50" value={this.state.nickname} onChange={this.nameChanged}/></td>
         </tr>
         <tr><td colSpan="2"><input type="submit" value="Go"/></td></tr>
       </tbody>
