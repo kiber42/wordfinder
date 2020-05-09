@@ -101,7 +101,7 @@ END//
 
 CREATE PROCEDURE start_game(token_ INT)
 proc: BEGIN
-  SELECT game_state, p.room_id INTO @game_state, @room_id FROM Rooms NATURAL JOIN Players WHERE token = token_;
+  SELECT game_state, p.room_id INTO @game_state, @room_id FROM Rooms NATURAL JOIN Players p WHERE token = token_;
   IF @game_state != "lobby" THEN
     LEAVE proc;
   END IF;
@@ -137,7 +137,7 @@ END//
 
 CREATE PROCEDURE choose_word(token_ INT, word_index INT)
 proc: BEGIN
-  SELECT game_state, p.room_id INTO @game_state, @room_id FROM Rooms NATURAL JOIN Players WHERE token = token_;
+  SELECT game_state, p.room_id INTO @game_state, @room_id FROM Rooms NATURAL JOIN Players p WHERE token = token_;
   IF @game_state != "choosing" THEN
     LEAVE proc;
   END IF;
