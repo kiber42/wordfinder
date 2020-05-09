@@ -4,12 +4,12 @@ include 'mysql.php';
 
 if (!isset($_REQUEST['id']))
     exit(json_encode(["error" => "Incomplete request."]));
-$vote_id = $_REQUEST['id'];
+$voted_id = (int)$_REQUEST['id'];
 
 // Retrieve information about player and game
 $query_str = "SELECT role, game_state, secret_found, vote, p.room_id FROM Players p NATURAL JOIN Rooms WHERE token = ?";
 $token = @$_REQUEST['token'];
-$success = ($stmt = $sql->prepare($query_str)) && $stmt->bind_param('s', $token) && $stmt->execute() &&
+$success = ($stmt = $sql->prepare($query_str)) && $stmt->bind_param('i', $token) && $stmt->execute() &&
     ($result = $stmt->get_result()) && ($row = $result->fetch_row());
 if (!$success)
     exit(json_encode(["error" => "Invalid token."]));
@@ -20,7 +20,7 @@ if ($game_state != "vote" || $vote != null || ($secret_found == true && $role !=
     exit(json_encode(["error" => "Voting not possible."]));
 
 $query_str = "UPDATE Players SET vote = ? WHERE token = ?";
-$success = ($stmt = $sql->prepare($query_str)) && $stmt->bind_param('is', $vote_id, $token) && $stmt->execute();
+$success = ($stmt = $sql->prepare($query_str)) && $stmt->bind_param('ii', $voted_id, $token) && $stmt->execute();
 if (!$success || $sql->affected_rows != 1)
     exit(json_encode(["error" => "Failed to count vote."]));
 

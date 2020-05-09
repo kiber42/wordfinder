@@ -2,16 +2,16 @@
 header('Content-Type: application/json');
 include 'mysql.php';
 
-// Retrieve information about player and game state
+// Retrieve information about player and game state.
+// Not using a prepared statement here since this is the most frequently called script.
+$token = (int)@$_REQUEST['token'];
 $query_str =
     "SELECT player_id, nickname, role, vote, p.room_id, room_name, game_state, mayor, difficulty - 1, " .
-    "secret_found, role_found, TIME_TO_SEC(TIMEDIFF(NOW(), timer_start)) FROM Players p NATURAL JOIN Rooms WHERE token = ?";
-$token = @$_REQUEST['token'];
-$success = ($stmt = $sql->prepare($query_str)) && $stmt->bind_param('s', $token) && $stmt->execute() &&
-    ($result = $stmt->get_result()) && ($row = $result->fetch_row());
+    "secret_found, role_found, TIME_TO_SEC(TIMEDIFF(NOW(), timer_start)) FROM Players p NATURAL JOIN Rooms WHERE token = $token";
+$success = ($result = $sql->query($query_str)) && ($row = $result->fetch_row());
 if (!$success)
     exit(json_encode(["error" => "Invalid token."]));
-$stmt->close();
+$result->close();
 
 list($player_id, $nickname, $role, $vote, $room_id, $room_name, $game_state, $mayor_id, $difficulty, $secret_found, $role_found, $seconds) = $row;
 

@@ -26,7 +26,7 @@ CREATE TABLE Players
 (
   player_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   room_id INT NOT NULL,
-  token VARCHAR(20) CHARACTER SET utf8mb4 NOT NULL,
+  token INT NOT NULL UNIQUE,
   nickname VARCHAR(50) CHARACTER SET utf8mb4 NOT NULL,
   last_seen DATETIME NOT NULL,
   role ENUM('werewolf', 'seer', 'villager', 'sage', 'freemason'),
@@ -54,6 +54,17 @@ BEGIN
   RETURN name;
 END//
 
+CREATE PROCEDURE remove_expired()
+BEGIN
+  CREATE TEMPORARY TABLE RoomsToDelete SELECT room_id FROM Rooms WHERE expires < NOW();
+  SET FOREIGN_KEY_CHECKS = 0;
+  DELETE P.* FROM RoomsToDelete NATURAL JOIN Players P;
+  DELETE W.* FROM RoomsToDelete NATURAL JOIN WordChoices W;
+  DELETE Rooms.* FROM RoomsToDelete NATURAL JOIN Rooms;
+  SET FOREIGN_KEY_CHECKS = 1;
+  DROP TEMPORARY TABLE RoomsToDelete;
+END//
+
 CREATE FUNCTION request_room(name CHAR(50))
 RETURNS INT
 BEGIN
@@ -65,14 +76,27 @@ BEGIN
   ELSE
     UPDATE Rooms SET expires = ADDDATE(NOW(), 1) WHERE room_id = @room;
   END IF;
-  CREATE TEMPORARY TABLE RoomsToDelete SELECT room_id FROM Rooms WHERE expires < NOW();
-  SET FOREIGN_KEY_CHECKS = 0;
-  DELETE P.* FROM RoomsToDelete NATURAL JOIN Players P;
-  DELETE W.* FROM RoomsToDelete NATURAL JOIN WordChoices W;
-  DELETE Rooms.* FROM RoomsToDelete NATURAL JOIN Rooms;
-  SET FOREIGN_KEY_CHECKS = 1;
-  DROP TEMPORARY TABLE RoomsToDelete;
+  CALL remove_expired();
   RETURN @room;
+END//
+
+CREATE FUNCTION add_player(name CHAR(50), room_id_ INT)
+RETURNS INT
+BEGIN
+  REPEAT
+    SELECT FLOOR(RAND() * 900000000 + 100000000) INTO @token;
+    SELECT COUNT(1) INTO @found FROM Players WHERE token = @token;
+  UNTIL @found = 0 END REPEAT;
+  INSERT INTO Players(nickname, room_id, token, last_seen) VALUES (name, room_id_, @token, NOW());
+  RETURN @token;
+END//
+
+CREATE FUNCTION add_player_to_room(nickname CHAR(50), roomname CHAR(50))
+RETURNS INT
+BEGIN
+  SELECT request_room(roomname) INTO @room_id;
+  SELECT add_player(nickname, @room_id) INTO @token;
+  RETURN @token;
 END//
 
 CREATE PROCEDURE start_game(room_id_ INT)

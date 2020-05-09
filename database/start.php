@@ -4,7 +4,7 @@ include 'mysql.php';
 
 $query_str = "SELECT room_id FROM Players WHERE token = ?";
 $token = @$_REQUEST['token'];
-$success = ($stmt = $sql->prepare($query_str)) && $stmt->bind_param('s', $token) && $stmt->execute() &&
+$success = ($stmt = $sql->prepare($query_str)) && $stmt->bind_param('i', $token) && $stmt->execute() &&
     ($result = $stmt->get_result()) && ($row = $result->fetch_row());
 if (!$success)
     exit(json_encode(["error" => "Invalid token."]));
