@@ -292,6 +292,7 @@ class MayorView extends Component {
 class Countdown extends Component {
   constructor(props) {
     super(props);
+    this.seconds_initial_previous = this.props.seconds_initial;
     this.state = {
       seconds_left: this.props.seconds_initial,
       end_time: Date.now() + this.props.seconds_initial * 1000
@@ -313,7 +314,18 @@ class Countdown extends Component {
   }
 
   refresh() {
-    this.setState({seconds_left: Math.max(0, Math.floor((this.state.end_time - Date.now()) / 1000))});
+    // Respond to props change if it clearly contradicts current value
+    const value = Math.floor((this.state.end_time - Date.now()) / 1000);
+    this.setState({seconds_left: Math.max(0, value)});
+    if (this.props.seconds_initial != this.seconds_initial_previous) {
+      this.seconds_initial_previous = this.props.seconds_initial;
+      if (Math.abs(value - this.props.seconds_initial) > 3) {
+        this.setState({
+          seconds_left: this.props.seconds_initial,
+          end_time: Date.now() + this.props.seconds_initial * 1000
+        });
+      }
+    }
   }
 }
 
