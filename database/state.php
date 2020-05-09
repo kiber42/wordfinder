@@ -121,7 +121,7 @@ else if ($game_state == "lobby" && $secret_found !== null)
 // Report time remaining and check for time-out
 if ($game_state != "lobby")
 {
-    $timeout = $game_state == "main" ? 4 : 60;
+    $timeout = $game_state == "main" ? 4 * 60 : 60;
     $seconds_left = $timeout - (int)$seconds;
     $response["seconds_left"] = $seconds_left;
     if ($seconds_left <= 0)
