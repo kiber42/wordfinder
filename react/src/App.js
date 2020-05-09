@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import copy from 'copy-to-clipboard';
+
+import { Connection } from './Context';
 
 import Login from './Login'
+import LobbyView from './Lobby'
 
 import './App.css';
-
-const Connection = React.createContext({token: ""});
 
 class App extends Component {
   constructor(props) {
@@ -49,10 +49,9 @@ class App extends Component {
                     received_votes={this.state.received_votes}
                     players={this.state.players}
                     num_players={this.state.players.length + 1}
-                    seconds_left={this.state.seconds_left}/>
+                    seconds_left={this.state.seconds_left}
+                    invite_link={this.state.invite_link}/>
       </>
-      if (this.state.game_state === "lobby")
-        items = <>{items}<Invite link={this.state.join_link}/></>
       if (!this.state.connected)
         items = <>{items}<div>No connection to server!</div></>
 
@@ -117,7 +116,7 @@ class App extends Component {
             voted_name: result.voted_name,
             received_votes: result.received_votes_from,
             seconds_left: result.seconds_left,
-            join_link: result.join_link,
+            invite_link: result.join_link,
             is_valid: true,
             connected: true,
           });
@@ -152,11 +151,11 @@ class GameView extends Component {
           return (
             <div>
               <ResultView winner={winner} werewolf_name={this.props.werewolf_name} seer_name={this.props.seer_name} received_votes={this.props.received_votes}/>
-              <LobbyView num_players={this.props.num_players} difficulty={this.props.difficulty}/>
+              <LobbyView num_players={this.props.num_players} difficulty={this.props.difficulty} invite_link={this.props.invite_link}/>
             </div>
           );
         }
-        return <LobbyView num_players={this.props.num_players} difficulty={this.props.difficulty}/>
+        return <LobbyView num_players={this.props.num_players} difficulty={this.props.difficulty} invite_link={this.props.invite_link}/>
       case "choosing":
         if (this.props.is_mayor)
           return <WordChoice words={this.props.words} role={this.props.role} seconds_left={this.props.seconds_left}/>
@@ -218,58 +217,6 @@ class Teammates extends Component {
     if (this.props.waiting.length === 0)
       return <div>Mit dir im Spiel: {names}</div>;
     return <div><div>Mit dir im Spiel: {names}</div><div>In der Lobby: {waiting}</div></div>;
-  }
-}
-
-class LobbyView extends Component {
-  static contextType = Connection;
-
-  render() {
-    let startButton;
-    if (this.props.num_players >= 3)
-      startButton = <div>Alle da? Dann <button onClick={() => this.startGame()}>Spiel starten!</button></div>
-    else
-      startButton = <div>In der Lobby, warte auf Mitspieler.</div>
-    return (
-      <div>
-        <Difficulty difficulty={this.props.difficulty}/>
-        {startButton}
-      </div>
-    );   
-  }
-
-  startGame() {
-    fetch("start.php?token=" + this.context.token).then().catch(err => console.error(err));
-  }
-}
-
-class Difficulty extends Component {
-  static contextType = Connection;
-
-  static levels = ["leicht", "normal", "schwer", "unmöglich"];
-
-  render() {
-    const difficultyButtons = Difficulty.levels.map((level, index) =>
-      <label><input type='radio' checked={index===this.props.difficulty} onClick={() => this.setDifficulty(index)} key={index} />{level}</label>);
-    return <div>Schwierigkeit: {difficultyButtons}</div>
-  }
-
-  setDifficulty(level) {
-    fetch("settings.php?token=" + this.context.token + "&difficulty=" + level).then().catch(err => console.error(err));
-  }
-}
-
-class Invite extends Component {
-  render() {
-    return (
-      <div>
-        <div>Verwende diesen Link, um Mitspieler einzuladen:</div>
-        <div>
-          <input type="text" size={this.props.link.length} id="link" value={this.props.link} readOnly/>
-          <button onClick={() => copy(this.props.link)}>Link kopieren</button>
-        </div>
-      </div>
-    );
   }
 }
 
