@@ -186,7 +186,6 @@ class GameView extends Component {
         return <div>Aktueller Spiel-Zustand ({this.props.state}) nicht implementiert!</div>
     }    
   }
-
 }
 
 class Welcome extends Component {
@@ -226,16 +225,14 @@ class LobbyView extends Component {
   static contextType = Connection;
 
   render() {
-    const difficulties = ["leicht", "normal", "schwer", "unmöglich"];
-    const difficultyButtons = difficulties.map((level, index) => <button onClick={() => this.setDifficulty(index)} key={index}>{level}</button>)
     let startButton;
     if (this.props.num_players >= 3)
-     startButton = <div>Alle da? Dann <button onClick={() => this.startGame()}>Spiel starten! (auf {difficulties[this.props.difficulty]})</button></div>
+      startButton = <div>Alle da? Dann <button onClick={() => this.startGame()}>Spiel starten!</button></div>
     else
       startButton = <div>In der Lobby, warte auf Mitspieler.</div>
     return (
       <div>
-        <div>Schwierigkeit: {difficultyButtons}</div>
+        <Difficulty difficulty={this.props.difficulty}/>
         {startButton}
       </div>
     );   
@@ -243,6 +240,18 @@ class LobbyView extends Component {
 
   startGame() {
     fetch("start.php?token=" + this.context.token).then().catch(err => console.error(err));
+  }
+}
+
+class Difficulty extends Component {
+  static contextType = Connection;
+
+  static levels = ["leicht", "normal", "schwer", "unmöglich"];
+
+  render() {
+    const difficultyButtons = Difficulty.levels.map((level, index) =>
+      <label><input type='radio' checked={index===this.props.difficulty} onClick={() => this.setDifficulty(index)} key={index} />{level}</label>);
+    return <div>Schwierigkeit: {difficultyButtons}</div>
   }
 
   setDifficulty(level) {
