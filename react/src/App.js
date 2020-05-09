@@ -294,7 +294,7 @@ class WordChoice extends Component {
   }
 
   choose(index) {
-    fetch("start.php?token=" + this.context.token + "&index=" + index).then().catch(err => console.error(err));
+    fetch("choose.php?token=" + this.context.token + "&index=" + index).then().catch(err => console.error(err));
   }
 }
 

@@ -12,6 +12,7 @@ $success = ($result = $sql->query($query_str)) && ($row = $result->fetch_row());
 if (!$success)
     exit(json_encode(["error" => "Invalid token."]));
 $result->close();
+// $token can be considered as safe from here on
 
 list($player_id, $nickname, $role, $vote, $room_id, $room_name, $game_state, $mayor_id, $difficulty, $secret_found, $role_found, $seconds) = $row;
 
@@ -127,7 +128,7 @@ if ($game_state != "lobby")
     if ($seconds_left <= 0)
     {
         switch ($game_state) {
-        case "choosing": $sql->query("CALL choose_word(${room_id}, 0)"); break;
+        case "choosing": $sql->query("CALL choose_word($token, 0)"); break;
         case "main": $sql->query("UPDATE Rooms SET game_state = 'vote', secret_found = 0, timer_start = NOW() WHERE room_id = ${room_id}"); break;
         case "vote": $sql->query("CALL check_votes(${room_id}, 1)"); break;
         }

@@ -99,13 +99,13 @@ BEGIN
   RETURN @token;
 END//
 
-CREATE PROCEDURE start_game(room_id_ INT)
+CREATE PROCEDURE start_game(token_ INT)
 proc: BEGIN
-  SELECT game_state INTO @game_state FROM Rooms WHERE room_id = room_id_;
+  SELECT game_state, p.room_id INTO @game_state, @room_id FROM Rooms NATURAL JOIN Players WHERE token = token_;
   IF @game_state != "lobby" THEN
     LEAVE proc;
   END IF;
-  CREATE TEMPORARY TABLE PlayersInGame SELECT player_id FROM Players WHERE room_id = room_id_ AND last_seen > ADDTIME(NOW(), -12);
+  CREATE TEMPORARY TABLE PlayersInGame SELECT player_id FROM Players WHERE room_id = @room_id AND last_seen > ADDTIME(NOW(), -12);
   SELECT COUNT(1) FROM PlayersInGame INTO @num_players;
   IF @num_players < 3 THEN
     LEAVE proc;
@@ -115,34 +115,34 @@ proc: BEGIN
   SELECT player_id INTO @werewolf FROM PlayersInGame ORDER BY RAND() LIMIT 1;
   SELECT player_id INTO @seer FROM PlayersInGame WHERE player_id != @werewolf ORDER BY RAND() LIMIT 1;
   # Adjust player info
-  UPDATE Players SET role = NULL, vote = NULL WHERE room_id = room_id_;
+  UPDATE Players SET role = NULL, vote = NULL WHERE room_id = @room_id;
   UPDATE Players NATURAL JOIN PlayersInGame SET role = "villager";
   UPDATE Players SET role = "werewolf" WHERE player_id = @werewolf;
   UPDATE Players SET role = "seer" WHERE player_id = @seer;
   DROP TEMPORARY TABLE PlayersInGame;
   # Create list of words to choose from
-  SELECT difficulty + 0 INTO @diff FROM Rooms WHERE room_id = room_id_;
-  DELETE FROM WordChoices WHERE room_id = room_id_;
+  SELECT difficulty + 0 INTO @diff FROM Rooms WHERE room_id = @room_id;
+  DELETE FROM WordChoices WHERE room_id = @room_id;
   CREATE TEMPORARY TABLE ChoicesForThisGame SELECT word_id FROM Words WHERE difficulty = @diff ORDER BY RAND() LIMIT 3;
   IF @mayor = @werewolf AND @diff < 4 THEN
     INSERT INTO ChoicesForThisGame SELECT word_id FROM Words WHERE difficulty = @diff + 1 ORDER BY RAND() LIMIT 1;
   ELSEIF @mayor = @seer AND @diff > 1 THEN
     INSERT INTO ChoicesForThisGame SELECT word_id FROM Words WHERE difficulty = @diff - 1 ORDER BY RAND() LIMIT 1;
   END IF;
-  INSERT INTO WordChoices(room_id, word_id) SELECT room_id_, word_id FROM ChoicesForThisGame ORDER BY RAND();
+  INSERT INTO WordChoices(room_id, word_id) SELECT @room_id, word_id FROM ChoicesForThisGame ORDER BY RAND();
   DROP TEMPORARY TABLE ChoicesForThisGame;
   # Update room info
-  UPDATE Rooms SET game_state = "choosing", timer_start = NOW(), mayor = @mayor, secret_found = 0, role_found = 0, expires = ADDDATE(NOW(), 1) WHERE room_id = room_id_;
+  UPDATE Rooms SET game_state = "choosing", timer_start = NOW(), mayor = @mayor, secret_found = 0, role_found = 0, expires = ADDDATE(NOW(), 1) WHERE room_id = @room_id;
 END//
 
-CREATE PROCEDURE choose_word(room_id_ INT, word_index INT)
+CREATE PROCEDURE choose_word(token_ INT, word_index INT)
 proc: BEGIN
-  SELECT game_state INTO @game_state FROM Rooms WHERE room_id = room_id_;
+  SELECT game_state, p.room_id INTO @game_state, @room_id FROM Rooms NATURAL JOIN Players WHERE token = token_;
   IF @game_state != "choosing" THEN
     LEAVE proc;
   END IF;
-  SELECT word_id INTO @word_id FROM WordChoices WHERE room_id = room_id_ LIMIT word_index, 1;
-  UPDATE Rooms SET game_state = "main", timer_start = NOW(), secret = @word_id WHERE room_id = room_id_;
+  SELECT word_id INTO @word_id FROM WordChoices WHERE room_id = @room_id LIMIT word_index, 1;
+  UPDATE Rooms SET game_state = "main", timer_start = NOW(), secret = @word_id WHERE room_id = @room_id;
 END//
 
 CREATE PROCEDURE check_votes(room_id_ INT, time_up BIT(1))
