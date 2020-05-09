@@ -152,7 +152,11 @@ proc: BEGIN
   IF @game_state != "choosing" THEN
     LEAVE proc;
   END IF;
-  SELECT word_id INTO @word_id FROM WordChoices WHERE room_id = @room_id LIMIT word_index, 1;
+  IF word_index >= 0 THEN
+    SELECT word_id INTO @word_id FROM WordChoices WHERE room_id = @room_id LIMIT word_index, 1;
+  ELSE
+    SELECT word_id INTO @word_id FROM WordChoices WHERE room_id = @room_id ORDER BY RAND() LIMIT 1;
+  END IF;
   UPDATE Rooms SET game_state = "main", timer_start = NOW(), secret = @word_id WHERE room_id = @room_id;
 END//
 

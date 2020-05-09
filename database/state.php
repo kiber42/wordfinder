@@ -128,7 +128,7 @@ if ($game_state != "lobby")
     if ($seconds_left <= 0)
     {
         switch ($game_state) {
-        case "choosing": $sql->query("CALL choose_word($token, 0)"); break;
+        case "choosing": $sql->query("CALL choose_word($token, -1)"); break;
         case "main": $sql->query("UPDATE Rooms SET game_state = 'vote', secret_found = 0, timer_start = NOW() WHERE room_id = ${room_id}"); break;
         case "vote": $sql->query("CALL check_votes(${room_id}, 1)"); break;
         }
