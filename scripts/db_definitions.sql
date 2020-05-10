@@ -133,10 +133,10 @@ BEGIN
   SELECT difficulty + 0 INTO @diff FROM Rooms WHERE room_id = room;
   DELETE FROM WordChoices WHERE room_id = room;
   CREATE TEMPORARY TABLE ChoicesForThisGame SELECT word_id FROM Words WHERE difficulty = @diff ORDER BY RAND() LIMIT 3;
-  IF mayor = werewolf AND @diff < 4 THEN
-    INSERT INTO ChoicesForThisGame SELECT word_id FROM Words WHERE difficulty = @diff + 1 ORDER BY RAND() LIMIT 1;
-  ELSEIF mayor = seer AND @diff > 1 THEN
-    INSERT INTO ChoicesForThisGame SELECT word_id FROM Words WHERE difficulty = @diff - 1 ORDER BY RAND() LIMIT 1;
+  IF mayor = werewolf THEN
+    INSERT INTO ChoicesForThisGame SELECT word_id FROM Words WHERE difficulty = LEAST(@diff + 1, 4) ORDER BY RAND() LIMIT 1;
+  ELSEIF mayor = seer THEN
+    INSERT INTO ChoicesForThisGame SELECT word_id FROM Words WHERE difficulty = GREATEST(@diff - 1, 1) ORDER BY RAND() LIMIT 1;
   END IF;
   INSERT INTO WordChoices(room_id, word_id) SELECT room, word_id FROM ChoicesForThisGame ORDER BY RAND();
   DROP TEMPORARY TABLE ChoicesForThisGame;
