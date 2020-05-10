@@ -359,6 +359,17 @@ class GuessingView extends Component {
   }
 }
 
+class NameGroup extends Component {
+  render() {
+    const items = this.props.items.map(item => <b>{item}</b>);
+    if (items.length >= 2)
+      return <>{items.slice(0, -1).reduce((a, b) => a + ", " + b)} und {items.slice(-1)} {this.props.plural}</>
+    if (items.length === 1)
+      return <>{items[0]} {this.props.singular}</>;
+    return null;
+  }
+}
+
 class VoteView extends Component {
   render() {   
     let vote;
@@ -369,7 +380,7 @@ class VoteView extends Component {
     else vote = (
       <div>
         <div>Das Zauberwort <b>{this.props.secret}</b> wurde erraten!</div>
-        <div><b>{this.props.werewolf_name}</b> ist der Werwolf!</div>
+        <div><NameGroup items={this.props.werewolf_name} singular="ist der Werwolf" plural="sind die Werwölfe"/>!</div>
         <div>Werwolf, finde die Seherin!</div>
       </div>
     );
@@ -406,7 +417,7 @@ class Vote extends Component {
 
   render() {
     if (this.props.voted_name !== undefined)
-      return <div>Du hast für {this.props.voted_name} gestimmt. Warte auf andere Spieler.</div>
+      return <div>Du hast für <b>{this.props.voted_name}</b> gestimmt. Warte auf andere Spieler.</div>
     const choices = this.props.players.map((item) => <button onClick={() => this.choose(item[0])} key={item[0]}>{item[1]}</button>);
     return <div>{choices}</div>
   }
@@ -420,11 +431,11 @@ class ResultView extends Component {
   render() {
     let winner;
     if (this.props.winner === "werewolf")
-      winner = <div>Werwolf <b>{this.props.werewolf_name}</b> hat gewonnen!</div>
+      winner = <div>Werwolf <NameGroup items={this.props.werewolf_name} singular="hat" plural="haben"/> gewonnen!</div>
     else
       winner = (
         <div>
-          <div><b>{this.props.werewolf_name}</b> war der Werwolf.</div>
+          <div><NameGroup items={this.props.werewolf_name} singular="war der Werwolf" plural="waren die Werwölfe"/>.</div>
           <div>Die Dorfbewohner haben gewonnen!</div>
         </div>
         );
@@ -432,7 +443,7 @@ class ResultView extends Component {
       <div>
         <div>Die Runde ist zu Ende:</div>
         <VoteResults received_votes={this.props.received_votes}/>
-        <div><b>{this.props.seer_name}</b> war die Seherin.</div>
+        <div><NameGroup items={this.props.seer_name} singular="war die Seherin" plural="waren die Seherinnen"/>.</div>
         {winner}
       </div>
     );
@@ -441,15 +452,9 @@ class ResultView extends Component {
 
 class VoteResults extends Component {
   render() {
-    function prettyJoin(items) {
-      return items.slice(0, -1).join(", ") + " und " + items.slice(-1);
-    }
-
     const list = Object.keys(this.props.received_votes).map((vote_recipient, index) => {
       const voters = this.props.received_votes[vote_recipient];
-      if (voters.length < 2)
-        return <li key={index}>{voters[0]} stimmte für <b>{vote_recipient}</b></li>
-      return <li key={index}>{prettyJoin(voters)} stimmten für <b>{vote_recipient}</b></li>
+      return <li key={index}><NameGroup items={voters} singular="stimmte" plural="stimmten"/> für <b>{vote_recipient}</b></li>
     });
     return <ul>{list}</ul>
   }
