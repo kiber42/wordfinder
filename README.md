@@ -6,11 +6,18 @@ A little project that you can run on your own server and invite friends to play 
 
 You need a server that runs php and has access to a MySQL database.
 
+## Overview of repository
+
+The repository has three top-level directories:
+  - `react` holds the project from which the web front-end is generated
+  - `database` holds scripts that are used by the front-end to access the database
+  - `scripts` holds the instructions needed to prepare the code you need to serve and to initialize the MySQL database
+
 ## Building the server code
 
 In the scripts directory, run the deploy.sh script (for Linux, presumably also runs on MacOS, and the basic steps should also be the same on Windows).
 It will first install the required node packages and build the node project, and then copy the required files into one place (by default a directory called server).
-In this directory you find the code that needs to be accessible on your server, so you have to copy it for example to `/var/www/html` or a subdirectory thereof.
+In that directory you will find the code that needs to be accessible on your server, so you have to copy it for example to `/var/www/html` or a subdirectory thereof.
 
 ## Preparing the database
 
