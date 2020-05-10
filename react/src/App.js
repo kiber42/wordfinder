@@ -40,6 +40,7 @@ class App extends Component {
                     is_mayor={this.state.is_mayor}
                     mayor={this.state.mayor}
                     difficulty={this.state.difficulty}
+                    num_werewolves={this.state.num_werewolves}
                     words={this.state.words}
                     secret_found={this.state.secret_found}
                     role_found={this.state.role_found}
@@ -108,6 +109,7 @@ class App extends Component {
             is_mayor: result.is_mayor,
             mayor: result.mayor,
             difficulty: result.difficulty,
+            num_werewolves: result.num_werewolves,
             words: result.words,
             secret_found: result.secret_found,
             role_found: result.role_found,
@@ -143,6 +145,10 @@ class GameView extends Component {
     {
       case "lobby":
         // Lobby is also used to show results of previous game
+        const lobby = <LobbyView num_players={this.props.num_players}
+                                 difficulty={this.props.difficulty}
+                                 num_werewolves={this.props.num_werewolves}
+                                 invite_link={this.props.invite_link}/>;
         if (this.props.secret_found !== undefined)
         {
           // Secret found and seer found => Werewolf wins
@@ -151,11 +157,11 @@ class GameView extends Component {
           return (
             <div>
               <ResultView winner={winner} werewolf_name={this.props.werewolf_name} seer_name={this.props.seer_name} received_votes={this.props.received_votes}/>
-              <LobbyView num_players={this.props.num_players} difficulty={this.props.difficulty} invite_link={this.props.invite_link}/>
+              {lobby}
             </div>
           );
         }
-        return <LobbyView num_players={this.props.num_players} difficulty={this.props.difficulty} invite_link={this.props.invite_link}/>
+        return lobby;
       case "choosing":
         if (this.props.is_mayor)
           return <WordChoice words={this.props.words} role={this.props.role} seconds_left={this.props.seconds_left}/>
@@ -317,7 +323,7 @@ class Countdown extends Component {
     // Respond to props change if it clearly contradicts current value
     const value = Math.floor((this.state.end_time - Date.now()) / 1000);
     this.setState({seconds_left: Math.max(0, value)});
-    if (this.props.seconds_initial != this.seconds_initial_previous) {
+    if (this.props.seconds_initial !== this.seconds_initial_previous) {
       this.seconds_initial_previous = this.props.seconds_initial;
       if (Math.abs(value - this.props.seconds_initial) > 3) {
         this.setState({

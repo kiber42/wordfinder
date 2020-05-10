@@ -15,6 +15,7 @@ class LobbyView extends Component {
     return (
       <div>
         <Difficulty current={this.props.difficulty}/>
+        <NumWerewolves current={this.props.num_werewolves} num_players={this.props.num_players}/>
         {startButton}
         <Invite link={this.props.invite_link}/>
       </div>
@@ -39,6 +40,21 @@ class Difficulty extends Component {
 
   setDifficulty(level) {
     fetch("settings.php?token=" + this.context.token + "&difficulty=" + level).then().catch(err => console.error(err));
+  }
+}
+
+class NumWerewolves extends Component {
+  static contextType = Connection;
+
+  render() {
+    const choices = [1, 2].map(n =>
+      <label><input type='radio' checked={n===this.props.current} onClick={() => this.setNumber(n)} key={n} />{n}</label>);
+    const recommended = this.props.num_players <= 6 ? 1 : 2;
+    return <div>Anzahl Werwölfe: {choices} (empfohlen: {recommended})</div>
+  }
+
+  setNumber(n) {
+    fetch("settings.php?token=" + this.context.token + "&num_werewolves=" + n).then().catch(err => console.error(err));
   }
 }
 
