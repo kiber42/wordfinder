@@ -113,26 +113,34 @@ BEGIN
   RETURN @token;
 END//
 
-CREATE PROCEDURE assign_roles(IN room_id_ INT, OUT mayor INT, OUT mayor_special INT)
+CREATE PROCEDURE assign_roles(IN room_id_ INT, IN num_werewolves INT, OUT mayor INT, OUT mayor_special INT)
 BEGIN
   CREATE TEMPORARY TABLE PlayersInGame SELECT player_id FROM Players WHERE room_id = room_id_ AND last_seen > ADDTIME(NOW(), -12) ORDER BY RAND();
   SELECT COUNT(1) FROM PlayersInGame INTO @num_players;
   IF @num_players < 3 THEN
     SET mayor = 0;
   ELSE
-    SELECT player_id INTO mayor FROM PlayersInGame ORDER BY RAND() LIMIT 1;
-    SELECT player_id INTO @werewolf FROM PlayersInGame ORDER BY RAND() LIMIT 1;
-    SELECT player_id INTO @seer FROM PlayersInGame WHERE player_id != @werewolf ORDER BY RAND() LIMIT 1;
+    # Initially mark all players as villagers
     UPDATE Players SET role = NULL, vote = NULL WHERE room_id = room_id_;
-    UPDATE Players NATURAL JOIN PlayersInGame SET role = "villager";
-    DROP TEMPORARY TABLE PlayersInGame;
-    UPDATE Players SET role = "werewolf" WHERE player_id = @werewolf;
-    UPDATE Players SET role = "seer" WHERE player_id = @seer;
-    # mayor_special is used to compute a difficulty modifier for the mayor's word choices
+    UPDATE Players NATURAL JOIN PlayersInGame SET role = 'villager';
+    # Pick a mayor.  mayor_special is used to compute a difficulty modifier for the mayor's word choices
+    SELECT player_id INTO mayor FROM PlayersInGame ORDER BY RAND() LIMIT 1;
     SET mayor_special = 0;
-    IF mayor = @werewolf THEN
-      SET mayor_special = 1;
-    ELSEIF mayor = @seer THEN
+    # Assign special roles; at the very least two players must not be werewolves
+    WHILE num_werewolves > 0 AND @num_players > 2 DO
+      SELECT player_id INTO @werewolf FROM PlayersInGame LIMIT 1;
+      UPDATE Players SET role = 'werewolf' WHERE player_id = @werewolf;
+      DELETE FROM PlayersInGame WHERE player_id = @werewolf;
+      SET num_werewolves = num_werewolves - 1;
+      SET @num_players = @num_players - 1;
+      IF mayor = @werewolf THEN
+        SET mayor_special = 1;
+      END IF;
+    END WHILE;
+    SELECT player_id INTO @seer FROM PlayersInGame WHERE player_id != @werewolf LIMIT 1;
+    UPDATE Players SET role = "seer" WHERE player_id = @seer;
+    DROP TEMPORARY TABLE PlayersInGame;
+    IF mayor = @seer THEN
       SET mayor_special = -1;
     END IF;
   END IF;  
@@ -156,7 +164,7 @@ CREATE PROCEDURE start_game(token_ INT)
 proc: BEGIN
   SELECT game_state, num_werewolves, p.room_id INTO @game_state, @num_werewolves, @room_id FROM Rooms NATURAL JOIN Players p WHERE token = token_;
   IF @game_state != 'lobby' THEN LEAVE proc; END IF;
-  CALL assign_roles(@room_id, @mayor, @mayor_special);
+  CALL assign_roles(@room_id, @num_werewolves, @mayor, @mayor_special);
   IF @mayor = 0 THEN LEAVE proc; END IF;
   CALL prepare_word_choices(@room_id, @mayor_special);
   UPDATE Rooms SET game_state = 'choosing', timer_start = NOW(), mayor = @mayor, secret_found = 0, role_found = 0, expires = ADDDATE(NOW(), 1) WHERE room_id = @room_id;
