@@ -6,15 +6,15 @@ include 'mysql.php';
 // Not using a prepared statement here since this is the most frequently called script.
 $token = (int)@$_REQUEST['token'];
 $query_str =
-    "SELECT player_id, nickname, role, vote, p.room_id, room_name, game_state, mayor, difficulty - 1, " .
+    "SELECT player_id, nickname, role, vote, p.room_id, room_name, game_state, mayor, difficulty - 1, num_werewolves, " .
     "secret_found, role_found, TIME_TO_SEC(TIMEDIFF(NOW(), timer_start)) FROM Players p NATURAL JOIN Rooms WHERE token = $token";
 $success = ($result = $sql->query($query_str)) && ($row = $result->fetch_row());
 if (!$success)
     exit(json_encode(["error" => "Invalid token."]));
 $result->close();
-// $token can be considered as safe from here on
+// $token can be considered safe from here on
 
-list($player_id, $nickname, $role, $vote, $room_id, $room_name, $game_state, $mayor_id, $difficulty, $secret_found, $role_found, $seconds) = $row;
+list($player_id, $nickname, $role, $vote, $room_id, $room_name, $game_state, $mayor_id, $difficulty, $num_werewolves, $secret_found, $role_found, $seconds) = $row;
 
 $protocol = isset($_SERVER["HTTPS"]) ? "https://" : "http://";
 $link = $protocol . $_SERVER["HTTP_HOST"] . dirname($_SERVER["PHP_SELF"]) . "/?room_name=$room_name";
@@ -23,6 +23,7 @@ $response = ["nickname" => htmlspecialchars($nickname),
              "room_name" => htmlspecialchars($room_name),
              "game_state" => $game_state,
              "difficulty" => (int)$difficulty,
+             "num_werewolves" => (int)$num_werewolves,
              "player_role" => $role,
              "is_mayor" => $is_mayor,
              "join_link" => $link];
