@@ -44,7 +44,8 @@ class App extends Component {
                     words={this.state.words}
                     secret_found={this.state.secret_found}
                     role_found={this.state.role_found}
-                    werewolf_name={this.state.werewolf_name}
+                    werewolf_names={this.state.werewolf_names}
+                    other_werewolfes={this.state.other_werewolfes}
                     seer_name={this.state.seer_name}
                     voted_name={this.state.voted_name}
                     received_votes={this.state.received_votes}
@@ -96,6 +97,8 @@ class App extends Component {
       result => {
         if (!result.error)
         {
+          const other_werewolfes = result.werewolf_names ?
+            result.werewolf_names.filter(name => name !== result.nickname) : undefined;
           // Not all of the possible items will be sent by state.php in each
           // state of the game.  It is important to set missing items to
           // undefined, to avoid presenting outdated values.
@@ -113,8 +116,9 @@ class App extends Component {
             words: result.words,
             secret_found: result.secret_found,
             role_found: result.role_found,
-            werewolf_name: result.werewolf_name,
-            seer_name: result.seer_name,
+            werewolf_names: result.werewolf_names,
+            other_werewolfes: other_werewolfes,
+            seer_name: result.seer_names ? result.seer_names[0] : undefined,
             voted_name: result.voted_name,
             received_votes: result.received_votes_from,
             seconds_left: result.seconds_left,
@@ -156,7 +160,7 @@ class GameView extends Component {
           const winner = (this.props.secret_found + this.props.role_found) === 1 ? "villagers" : "werewolf";
           return (
             <div>
-              <ResultView winner={winner} werewolf_name={this.props.werewolf_name} seer_name={this.props.seer_name} received_votes={this.props.received_votes}/>
+              <ResultView winner={winner} werewolf_names={this.props.werewolf_names} seer_name={this.props.seer_name} received_votes={this.props.received_votes}/>
               {lobby}
             </div>
           );
@@ -164,11 +168,11 @@ class GameView extends Component {
         return lobby;
       case "choosing":
         if (this.props.is_mayor)
-          return <WordChoice words={this.props.words} role={this.props.role} seconds_left={this.props.seconds_left}/>
+          return <WordChoice words={this.props.words} role={this.props.role} seconds_left={this.props.seconds_left} other_werewolfes={this.props.other_werewolfes}/>
         return (
           <div>
             <div>Bürgermeister <b>{this.props.mayor}</b> wählt das Zauberwort aus.</div>
-            <SecretRole role={this.props.role}/>
+            <SecretRole role={this.props.role} other_werewolfes={this.props.other_werewolfes}/>
           </div>
         );
       case "main":
@@ -176,12 +180,12 @@ class GameView extends Component {
         if (this.props.is_mayor)
           return <MayorView role={this.props.role} secret={secret} seconds_left={this.props.seconds_left}/>
         else
-          return <GuessingView role={this.props.role} secret={secret} seconds_left={this.props.seconds_left}/>
+          return <GuessingView role={this.props.role} secret={secret} seconds_left={this.props.seconds_left} other_werewolfes={this.props.other_werewolfes}/>
       case "vote":
         return <VoteView secret={this.props.words[0]}
                          secret_found={this.props.secret_found}
                          role={this.props.role}
-                         werewolf_name={this.props.werewolf_name}
+                         werewolf_names={this.props.werewolf_names}
                          voted_name={this.props.voted_name}
                          players={this.props.players}
                          seconds_left={this.props.seconds_left}/>
@@ -228,14 +232,21 @@ class Teammates extends Component {
 
 class SecretRole extends Component {
   render() {
-    let role = "";
+    const message = "Deine geheime Rolle:";
     switch (this.props.role)
     {
-      case "werewolf": role = "Werwolf!"; break;
-      case "seer": role = "Seherin"; break;
-      case "villager": default: role = "Dorfbewohner"; break;
+      case "werewolf":
+        return (
+          <>
+            <div>{message} <b>Werwolf</b>!</div>
+            {this.props.other_werewolfes &&
+              <div><NameGroup items={this.props.other_werewolfes} singular="ist auch ein Werwolf." plural="sind auch Werwölfe."/></div>}
+          </>
+        );
+      case "seer": return <div>{message} <b>Seherin</b></div>
+      case "villager": return <div>{message} <b>Dorfbewohner</b></div>
+      default: return null;
     }
-    return <div>Deine geheime Rolle: <b>{role}</b></div>
   }
 }
 
@@ -247,7 +258,7 @@ class WordChoice extends Component {
     return (
       <div>
         <div>Du bist der Bürgermeister!</div>
-        <SecretRole role={this.props.role}/>
+        <SecretRole role={this.props.role} other_werewolfes={this.props.other_werewolfes}/>
         <div>Wähle dein Zauberwort:</div>
         <div>{words}</div>
         <Countdown seconds_initial={this.props.seconds_left}/>
@@ -351,7 +362,7 @@ class GuessingView extends Component {
     }
     return (
       <div>
-        <SecretRole role={this.props.role}/>
+        <SecretRole role={this.props.role} other_werewolfes={this.props.other_werewolfes}/>
         {instructions}
         <Countdown seconds_initial={this.props.seconds_left}/>
       </div>
@@ -361,12 +372,12 @@ class GuessingView extends Component {
 
 class NameGroup extends Component {
   render() {
+    if (!this.props.items)
+      return null;
     const items = this.props.items.map(item => <b>{item}</b>);
-    if (items.length >= 2)
-      return <>{items.slice(0, -1).reduce((a, b) => a + ", " + b)} und {items.slice(-1)} {this.props.plural}</>
     if (items.length === 1)
       return <>{items[0]} {this.props.singular}</>;
-    return null;
+    return <>{items.slice(0, -1).reduce((a, b) => <>{a}, {b}</>)} und {items.slice(-1)} {this.props.plural}</>
   }
 }
 
@@ -380,7 +391,7 @@ class VoteView extends Component {
     else vote = (
       <div>
         <div>Das Zauberwort <b>{this.props.secret}</b> wurde erraten!</div>
-        <div><NameGroup items={this.props.werewolf_name} singular="ist der Werwolf" plural="sind die Werwölfe"/>!</div>
+        <div><NameGroup items={this.props.werewolf_names} singular="ist der Werwolf" plural="sind die Werwölfe"/>!</div>
         <div>Werwolf, finde die Seherin!</div>
       </div>
     );
@@ -431,11 +442,11 @@ class ResultView extends Component {
   render() {
     let winner;
     if (this.props.winner === "werewolf")
-      winner = <div>Werwolf <NameGroup items={this.props.werewolf_name} singular="hat" plural="haben"/> gewonnen!</div>
+      winner = <div>Werwolf <NameGroup items={this.props.werewolf_names} singular="hat" plural="haben"/> gewonnen!</div>
     else
       winner = (
         <div>
-          <div><NameGroup items={this.props.werewolf_name} singular="war der Werwolf" plural="waren die Werwölfe"/>.</div>
+          <div><NameGroup items={this.props.werewolf_names} singular="war der Werwolf" plural="waren die Werwölfe"/>.</div>
           <div>Die Dorfbewohner haben gewonnen!</div>
         </div>
         );
@@ -443,7 +454,7 @@ class ResultView extends Component {
       <div>
         <div>Die Runde ist zu Ende:</div>
         <VoteResults received_votes={this.props.received_votes}/>
-        <div><NameGroup items={this.props.seer_name} singular="war die Seherin" plural="waren die Seherinnen"/>.</div>
+        <div><b>{this.props.seer_name}</b> war die Seherin.</div>
         {winner}
       </div>
     );

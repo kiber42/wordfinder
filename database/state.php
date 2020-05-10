@@ -91,25 +91,15 @@ if ($game_state == "vote" && $vote != null)
     $result->close();
 }
     
-// Reveal werewolf if word was found
-if ($game_state == "vote" && $secret_found == 1)
-{
-    $result = $sql->query("SELECT nickname FROM Players WHERE role = 'werewolf' AND room_id = ${room_id}");
-    $rows = $result->fetch_all();
-    $response["werewolf_name"] = [];
-    foreach ($rows as $row)
-        $response["werewolf_name"][] = $row[0];
-    $result->close();
-}
 // Result phase: reveal all special roles and everyone's votes
-else if ($game_state == "lobby" && $secret_found !== null)
+if ($game_state == "lobby" && $secret_found !== null)
 {
     $result = $sql->query("SELECT role, nickname FROM Players WHERE role IS NOT NULL AND role != 'villager' AND room_id = ${room_id}");
     $rows = $result->fetch_all();
     foreach ($rows as $row)
     {
         list($role_, $nickname_) = $row;
-        $key = $role_ . "_name";
+        $key = $role_ . "_names";
         if (!isset($response[$key]))
             $response[$key] = [];
         $response[$key][] = $nickname_;
@@ -123,6 +113,16 @@ else if ($game_state == "lobby" && $secret_found !== null)
     foreach ($rows as $row) { $received_votes[$row[1]][] = $row[0]; }
     uasort($received_votes, function ($a, $b) { return count($b) - count($a); });
     $response["received_votes_from"] = $received_votes;
+    $result->close();
+}
+// Reveal werewolf if word was found; also reveal werewolves to each other
+else if (($game_state == "vote" && $secret_found == 1) || $role == "werewolf")
+{
+    $result = $sql->query("SELECT nickname FROM Players WHERE role = 'werewolf' AND room_id = ${room_id}");
+    $rows = $result->fetch_all();
+    $response["werewolf_names"] = [];
+    foreach ($rows as $row)
+        $response["werewolf_names"][] = $row[0];
     $result->close();
 }
 
