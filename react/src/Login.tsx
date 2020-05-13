@@ -1,6 +1,22 @@
 import React from 'react';
 
-class Login extends React.Component {
+interface IProps {
+  room_name: string,
+  nickname: string,
+  tokenAvailable: (room_name: string, assignedToken: number) => void
+}
+
+interface IState {
+  room_name: string,
+  nickname: string,
+  message: string
+}
+
+class Login extends React.Component<IProps, IState> {
+  private roomChanged: React.ChangeEventHandler<HTMLInputElement>;
+  private nameChanged: React.ChangeEventHandler<HTMLInputElement>;
+  private handleSubmit: React.FormEventHandler;
+
   constructor(props) {
     super(props);
     this.state = {room_name: this.props.room_name ?? "", nickname: "", message: null};
@@ -44,14 +60,14 @@ class Login extends React.Component {
         </tr>
         <tr>
           <td><label htmlFor="nickname">Spielername:</label></td>
-          <td><input id="nickname" type="text" maxLength="50" value={this.state.nickname} onChange={this.nameChanged}/></td>
+          <td><input id="nickname" type="text" maxLength={50} value={this.state.nickname} onChange={this.nameChanged}/></td>
         </tr>
         {this.state.message && (
           <tr>
-            <td colSpan="2">{this.state.message}</td>
+            <td colSpan={2}>{this.state.message}</td>
           </tr>
         )}
-        <tr><td colSpan="2"><input type="submit" value="Go"/></td></tr>
+        <tr><td colSpan={2}><input type="submit" value="Go"/></td></tr>
       </tbody>
       </table>
     </form>
