@@ -3,7 +3,14 @@ import copy from 'copy-to-clipboard';
 
 import { Connection } from './Context';
 
-class LobbyView extends Component {
+interface LobbyViewProps {
+  difficulty: number,
+  invite_link: string,
+  num_players: number,
+  num_werewolves: number
+}
+
+class LobbyView extends Component<LobbyViewProps> {
   static contextType = Connection;
 
   render() {
@@ -27,7 +34,11 @@ class LobbyView extends Component {
   }
 }
 
-class Difficulty extends Component {
+interface DifficultyProps {
+  current: number
+};
+
+class Difficulty extends Component<DifficultyProps> {
   static contextType = Connection;
 
   static levels = ["leicht", "normal", "schwer", "unmöglich"];
@@ -43,7 +54,12 @@ class Difficulty extends Component {
   }
 }
 
-class NumWerewolves extends Component {
+interface NumWerewolvesProps {
+  current: number,
+  num_players: number
+};
+
+class NumWerewolves extends Component<NumWerewolvesProps> {
   static contextType = Connection;
 
   render() {
@@ -58,7 +74,11 @@ class NumWerewolves extends Component {
   }
 }
 
-class Invite extends Component {
+interface InviteProps {
+  link: string
+};
+
+class Invite extends Component<InviteProps> {
   render() {
     return (
       <div>
