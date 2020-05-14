@@ -372,7 +372,7 @@ class GuessingView extends Component {
 
 class NameGroup extends Component {
   render() {
-    if (!this.props.items)
+    if (!this.props.items || this.props.items.length === 0)
       return null;
     const items = this.props.items.map(item => <b>{item}</b>);
     if (items.length === 1)
