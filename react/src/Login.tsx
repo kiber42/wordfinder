@@ -1,18 +1,18 @@
-import React from 'react';
+import React from 'react'
 
 interface IProps {
-  room_name: string,
-  nickname: string,
-  tokenAvailable: (room_name: string, assignedToken: number) => void
+  room_name: string;
+  nickname: string;
+  tokenAvailable: (room_name: string, assignedToken: number) => void;
 }
 
 interface IState {
-  room_name: string,
-  nickname: string,
-  message: string
+  room_name: string;
+  nickname: string;
+  message: string;
 }
 
-class Login extends React.Component<IProps, IState> {
+export class Login extends React.Component<IProps, IState> {
   private roomChanged: React.ChangeEventHandler<HTMLInputElement>;
   private nameChanged: React.ChangeEventHandler<HTMLInputElement>;
   private handleSubmit: React.FormEventHandler;
@@ -74,5 +74,3 @@ class Login extends React.Component<IProps, IState> {
     );
   }
 }
-
-export default Login;

@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import copy from 'copy-to-clipboard';
+import React, { Component } from 'react'
+import copy from 'copy-to-clipboard'
 
-import { Connection } from './Context';
+import { Connection } from './Context'
 
 interface LobbyViewProps {
   difficulty: number,
@@ -92,4 +92,4 @@ class Invite extends Component<InviteProps> {
   }
 }
 
-export default LobbyView;
+export { LobbyView };
