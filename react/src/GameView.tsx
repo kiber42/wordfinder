@@ -42,10 +42,12 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
   //       (here or in a component further down the hierarchy)
 
   render() {
-    const content = this.getContent();
-    if (this.props.state === "main" && this.props.is_mayor)
-      return content;
-    return <>{content}<Countdown seconds_initial={this.props.seconds_left}/></>;
+    return (
+      <>
+        {this.getContent()}
+        <Countdown seconds_initial={this.props.seconds_left}/>
+      </>
+    );
   }
 
   getContent() : JSX.Element {

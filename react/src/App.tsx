@@ -5,8 +5,6 @@ import { Connection } from './Context'
 import { GameView } from './GameView'
 import { Login } from './Login'
 
-import './App.css'
-
 interface IProps {
   token?: number;
   room_name?: string;
