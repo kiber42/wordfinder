@@ -31,8 +31,8 @@ export class Countdown extends React.Component<IProps, IState> {
   componentDidUpdate(prevprops: IProps) {
     if (this.props.seconds_initial !== prevprops.seconds_initial) {
       const updatedEndTime = Date.now() + (this.props.seconds_initial ?? 0) * 1000;
-      const clockSkewInSeconds = this.state.end_time - updatedEndTime;
-      if (Math.abs(clockSkewInSeconds) > 3) {
+      const clockSkewInMilliseconds = this.state.end_time - updatedEndTime;
+      if (Math.abs(clockSkewInMilliseconds) > 3000) {
         this.setState({
           seconds_left: this.props.seconds_initial,
           end_time: updatedEndTime
