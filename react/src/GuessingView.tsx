@@ -7,24 +7,26 @@ interface IProps {
 }
 
 export class GuessingView extends React.Component<IProps & ISecretRoleProps> {
-  render() {
-    const secret = <div>Das Zauberwort ist: {this.props.secret}</div>;
-    let instructions;
+  private getInstructions() {
     switch (this.props.role) {
       case "werewolf":
-        instructions = <div>{secret}<div>Verhindere, dass die anderen es erraten -- aber ohne erkannt zu werden!</div></div>;
-        break;
+        return "Verhindere, dass die anderen es erraten — aber ohne erkannt zu werden!";
       case "seer":
-        instructions = <div>{secret}<div>Hilf den anderen es zu erraten -- aber ohne erkannt zu werden!</div></div>;
-        break;
-      case "villager": default:
-        instructions = <div>Erratet das Zauberwort, ehe die Zeit abläuft!</div>
+        return "Hilf den anderen es zu erraten — aber ohne erkannt zu werden!"
+      default:
+        return "Erratet das Zauberwort, ehe die Zeit abläuft!";
     }
+  }
+
+  render() {
     return (
-      <>
-        <SecretRole role={this.props.role} other_werewolves={this.props.other_werewolves}/>
-        {instructions}
-      </>
+      <div className={"player-container " + this.props.role + "-container"}>
+        <div className="player-info">
+          {this.props.secret && <div>Das Zauberwort ist: {this.props.secret}</div>}
+          <SecretRole role={this.props.role} other_werewolves={this.props.other_werewolves}/>
+          {this.getInstructions()}
+        </div>
+      </div>
     );
   }
 }

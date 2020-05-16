@@ -42,8 +42,8 @@ export class MayorView extends React.Component<IProps & ISecretRoleProps> {
     {
       const words = this.props.words.map((word, index) => <button onClick={() => this.choose_word(index)} key={index}>{word}</button>);
       return (
-        <div className="mayor-container">
-          <div className="mayor-info">
+        <div className="player-container mayor-container">
+          <div className="player-info">
             <div>Du bist der Bürgermeister!</div>
             <SecretRole role={this.props.role} other_werewolves={this.props.other_werewolves}/>
             <div>Wähle dein Zauberwort:</div>
@@ -55,8 +55,8 @@ export class MayorView extends React.Component<IProps & ISecretRoleProps> {
 
     return (
       <>
-      <div className="mayor-container">
-        <div className="mayor-info">
+      <div className="player-container mayor-container">
+        <div className="player-info">
           <div>Du bist {this.getTitle()}!</div>
           <div>Die anderen müssen das Wort erraten, aber du darfst nur mit Ja, Nein, und Vielleicht antworten.</div>
           <div>Das Zauberwort ist: {this.props.secret}</div>

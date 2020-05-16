@@ -1,20 +1,51 @@
-.mayor-container {
+.player-container {
   display: flex;
   flex-direction: row;
+  margin: 1rem;
 }
 
-.mayor-container:before {
-  content: url('images/mayor.svg');
+.player-container:before {
+  display: inline-block;
   width: 9.2rem;
   height: 12.75rem;
-  display: inline-block;
   margin: 1rem;
-  background-color: floralwhite;
 }
 
-.mayor-info {
+.player-info {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   margin: 1rem;
+}
+
+.mayor-container:before {
+  content: url('images/mayor.svg');
+}
+
+.mayor-container {
+  background-color: #92abd3;
+}
+
+.werewolf-container:before {
+  content: url('images/werewolf.svg');
+}
+
+.werewolf-container {
+  background-color: #df9a99;
+}
+
+.seer-container:before {
+  content: ""
+}
+
+.seer-container {
+  background-color: lightgreen;
+}
+
+.villager-container:before {
+  content: ""
+}
+
+.villager-container {
+  background-color: floralwhite;
 }
