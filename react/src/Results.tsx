@@ -24,7 +24,7 @@ export class ResultView extends Component<IResultViewProps> {
     return (
       <div>
         <div>Die Runde ist zu Ende:</div>
-        (this.props.received_votes && <VoteResults received_votes={(this.props.received_votes as [string, string[]][])}/>)
+        {this.props.received_votes && <VoteResults received_votes={this.props.received_votes}/>}
         <div><b>{this.props.seer_name}</b> war die Seherin.</div>
         {winner}
       </div>
@@ -45,5 +45,3 @@ class VoteResults extends Component<IVoteResults> {
     return <ul>{list}</ul>
   }
 }
-
-
