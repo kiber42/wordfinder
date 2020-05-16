@@ -1,11 +1,9 @@
 import React from 'react'
 
-import { Countdown } from './Countdown'
 import { SecretRole, ISecretRoleProps } from './SecretRole'
 
 interface IProps {
   secret?: string;
-  seconds_left: number;
 }
 
 export class GuessingView extends React.Component<IProps & ISecretRoleProps> {
@@ -23,11 +21,10 @@ export class GuessingView extends React.Component<IProps & ISecretRoleProps> {
         instructions = <div>Erratet das Zauberwort, ehe die Zeit abläuft!</div>
     }
     return (
-      <div>
+      <>
         <SecretRole role={this.props.role} other_werewolfes={this.props.other_werewolfes}/>
         {instructions}
-        <Countdown seconds_initial={this.props.seconds_left}/>
-      </div>
+      </>
     );
   }
 }

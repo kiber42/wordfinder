@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { Countdown } from './Countdown'
 import { GuessingView } from './GuessingView'
 import { LobbyView } from './Lobby'
 import { MayorView } from './MayorView'
@@ -21,7 +22,7 @@ interface IGameProps {
   werewolf_names?: string[];
   seer_name?: string;
   received_votes?: [string, string[]][];
-  seconds_left: number;
+  seconds_left?: number;
 }
 
 interface IPlayerProps {
@@ -41,6 +42,14 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
   //       (here or in a component further down the hierarchy)
 
   render() {
+    const content = this.getContent();
+    if (this.props.state === "main" && this.props.is_mayor)
+      return content;
+    return <>{content}<Countdown seconds_initial={this.props.seconds_left}/></>;
+  }
+
+  getContent() : JSX.Element {
+    const secret = this.props.words !== undefined ? this.props.words[0] : "";
     switch (this.props.state)
     {
       case "lobby":
@@ -55,10 +64,10 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
           // Secret not found and wolf not found => Werewolf wins
           const winner = (this.props.secret_found + (this.props.role_found ?? 0)) === 1 ? "villagers" : "werewolf";
           return (
-            <div>
+            <>
               <ResultView winner={winner} werewolf_names={this.props.werewolf_names ?? []} seer_name={this.props.seer_name ?? ""} received_votes={this.props.received_votes}/>
               {lobby}
-            </div>
+            </>
           );
         }
         return lobby;
@@ -67,7 +76,7 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
         {
           if (!this.props.words)
             console.warn("Have no words to choose from!");
-          return <WordChoice words={this.props.words ?? []} role={this.props.role} seconds_left={this.props.seconds_left} other_werewolfes={this.props.other_werewolfes}/>
+          return <WordChoice words={this.props.words ?? []} role={this.props.role} other_werewolfes={this.props.other_werewolfes}/>
         }
         return (
           <div>
@@ -75,22 +84,17 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
             <SecretRole role={this.props.role} other_werewolfes={this.props.other_werewolfes}/>
           </div>
         );
-      case "main": {
-        const secret = this.props.words !== undefined ? this.props.words[0] : "";
-        if (this.props.is_mayor)
-          return <MayorView role={this.props.role} secret={secret} seconds_left={this.props.seconds_left}/>
-        else
-          return <GuessingView role={this.props.role} secret={secret} seconds_left={this.props.seconds_left} other_werewolfes={this.props.other_werewolfes}/>
-      }
+      case "main":
+        return this.props.is_mayor ?
+          <MayorView role={this.props.role} secret={secret} seconds_left={this.props.seconds_left}/> :
+          <GuessingView role={this.props.role} secret={secret} other_werewolfes={this.props.other_werewolfes}/>;
       case "vote": {
-        const secret = this.props.words !== undefined ? this.props.words[0] : "";
         return <VoteView secret={secret}
                          secret_found={this.props.secret_found === 1}
                          role={this.props.role}
                          werewolf_names={this.props.werewolf_names ?? []}
                          voted_name={this.props.voted_name}
-                         players={this.props.players}
-                         seconds_left={this.props.seconds_left}/>
+                         players={this.props.players}/>
       }
       case "waiting":
         return <WaitView/>

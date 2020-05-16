@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 
 import { Connection } from './Context'
-import { Countdown } from './Countdown'
 import { NameGroup } from './NameGroup'
 
 interface IVoteViewProps {
@@ -9,7 +8,6 @@ interface IVoteViewProps {
   secret_found: boolean;
   secret: string;
   werewolf_names: string[];
-  seconds_left: number;
 }
 
 interface IVoteProps {
@@ -37,7 +35,6 @@ export class VoteView extends Component<IVoteViewProps & IVoteProps> {
           <div>Werewolf, finde die Seherin!</div>
         </div>)
       }
-      <div><Countdown seconds_initial={this.props.seconds_left}/></div>
     </>
     );
   }

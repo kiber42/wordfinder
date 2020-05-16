@@ -6,7 +6,7 @@ import { Countdown } from './Countdown'
 interface IProps {
   role: string;
   secret: string;
-  seconds_left: number;
+  seconds_left?: number;
 }
 
 export class MayorView extends React.Component<IProps> {
