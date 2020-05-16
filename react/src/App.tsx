@@ -7,16 +7,57 @@ import { Login } from './Login'
 
 import './App.css'
 
-class App extends Component {
+interface IProps {
+  token?: number;
+  room_name?: string;
+}
+
+interface IState {
+  is_valid: boolean;
+  connected: boolean;
+  error: "";
+  token?: number;
+  nickname: string;
+  room_name: string;
+  game_state: string;
+  players: string[];
+  players_waiting?: string[];
+  player_role: string;
+  is_mayor: boolean;
+  mayor?: string;
+  difficulty: number;
+  num_werewolves: number;
+  words?: string[];
+  secret_found?: number;
+  role_found?: number;
+  werewolf_names?: string[];
+  other_werewolfes?: string[];
+  seer_name?: string;
+  voted_name?: string;
+  received_votes?: any;
+  seconds_left?: number;
+  invite_link: string;
+}
+
+export class App extends Component<IProps, IState> {
+  private refresh_timer?: number;
+  private timeout_timer?: number;
+
   constructor(props) {
     super(props);
-    this.refresh_timer = 0;
-    this.timeout_timer = 0;
     this.state = {
       is_valid: false,
       connected: false,
       error: "",
-      token: this.props.token,
+      nickname: "",
+      room_name: "",
+      game_state: "",
+      players: [],
+      player_role: "",
+      is_mayor: false,
+      difficulty: 1,
+      num_werewolves: 1,
+      invite_link: ""
     }
   }
 
@@ -35,7 +76,6 @@ class App extends Component {
           <Welcome name={this.state.nickname} room={this.state.room_name}/>
           <Teammates active={this.state.players} waiting={this.state.players_waiting}/>
           <GameView state={this.state.game_state}
-                    player={this.state.nickname}
                     role={this.state.player_role}
                     is_mayor={this.state.is_mayor}
                     mayor={this.state.mayor}
@@ -82,15 +122,15 @@ class App extends Component {
     if (!this.state.token)
     {
       // User did not join a room yet, do not request state
-      this.refresh_timer = setTimeout(this.refresh.bind(this), 200);
+      this.refresh_timer = setTimeout((this.refresh.bind(this)) as TimerHandler, 200);
       return;
     }
 
-    this.timeout_timer = setTimeout(() => this.setState({connected : false}), 5000);
+    this.timeout_timer = setTimeout((() => this.setState({connected : false})) as TimerHandler, 5000);
     fetch("state.php?token=" + this.state.token)
     .then(result => result.json())
     .catch((err) => {
-      this.refresh_timer = setTimeout(this.refresh.bind(this), 2000);
+      this.refresh_timer = setTimeout((this.refresh.bind(this)) as TimerHandler, 2000);
       throw new Error("Could not reach server");
     })
     .then(
@@ -128,7 +168,7 @@ class App extends Component {
           });
           clearTimeout(this.timeout_timer);
           const refresh_delay = this.state.game_state === "main" ? 2000 : 500;
-          this.refresh_timer = setTimeout(this.refresh.bind(this), refresh_delay);
+          this.refresh_timer = setTimeout((this.refresh.bind(this) as TimerHandler), refresh_delay);
         }
         else
         {
@@ -136,14 +176,19 @@ class App extends Component {
           if (result.error === "Invalid token.")
             this.setState({token: null});
           else
-            this.setTimeout(this.refresh.bind(this), 3000);
+            setTimeout((this.refresh.bind(this) as TimerHandler), 3000);
         }
       })
     .catch(err => console.error(err));
   }
 }
 
-class Welcome extends Component {
+interface IWelcomeProps {
+  name: string;
+  room: string;
+}
+
+class Welcome extends Component<IWelcomeProps> {
   render() {
     return (
       <div>
@@ -154,7 +199,12 @@ class Welcome extends Component {
   }
 }
 
-class Teammates extends Component {
+interface ITeamProps {
+  active: string[];
+  waiting: string[];
+}
+
+class Teammates extends Component<ITeamProps> {
   render() {
     const names = this.props.active.map((item) => item[1]).join(", ");
     if (this.props.waiting === undefined)
@@ -175,5 +225,3 @@ class Teammates extends Component {
     return <div><div>Mit dir im Spiel: {names}</div><div>In der Lobby: {waiting}</div></div>;
   }
 }
-
-export default App;

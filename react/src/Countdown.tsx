@@ -11,7 +11,7 @@ interface IState {
 
 export class Countdown extends React.Component<IProps, IState> {
   private seconds_initial_previous: number;
-  private timer: NodeJS.Timeout;
+  private timer?: number;
 
   constructor(props) {
     super(props);
@@ -23,7 +23,7 @@ export class Countdown extends React.Component<IProps, IState> {
   }
 
   componentDidMount() {
-    this.timer = setInterval(() => this.refresh(), 200);
+    this.timer = setInterval((() => this.refresh()) as TimerHandler, 200);
   }
 
   componentWillUnmount() {

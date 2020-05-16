@@ -2,7 +2,6 @@ import React from 'react'
 
 interface IProps {
   room_name: string;
-  nickname: string;
   tokenAvailable: (room_name: string, assignedToken: number) => void;
 }
 
