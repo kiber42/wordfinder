@@ -29,7 +29,7 @@ interface IState {
   secret_found?: number;
   role_found?: number;
   werewolf_names?: string[];
-  other_werewolfes?: string[];
+  other_werewolves?: string[];
   seer_name?: string;
   voted_name?: string;
   received_votes?: [string, string[]][];
@@ -86,7 +86,7 @@ export class App extends Component<IProps, IState> {
                     secret_found={this.state.secret_found}
                     role_found={this.state.role_found}
                     werewolf_names={this.state.werewolf_names}
-                    other_werewolfes={this.state.other_werewolfes}
+                    other_werewolves={this.state.other_werewolves}
                     seer_name={this.state.seer_name}
                     voted_name={this.state.voted_name}
                     received_votes={this.state.received_votes}
@@ -138,7 +138,7 @@ export class App extends Component<IProps, IState> {
       result => {
         if (!result.error)
         {
-          const other_werewolfes = result.werewolf_names ?
+          const other_werewolves = result.werewolf_names ?
             result.werewolf_names.filter(name => name !== result.nickname) : undefined;
           // Not all of the possible items will be sent by state.php in each
           // state of the game.  It is important to set missing items to
@@ -158,7 +158,7 @@ export class App extends Component<IProps, IState> {
             secret_found: result.secret_found,
             role_found: result.role_found,
             werewolf_names: result.werewolf_names,
-            other_werewolfes: other_werewolfes,
+            other_werewolves: other_werewolves,
             seer_name: result.seer_names ? result.seer_names[0] : undefined,
             voted_name: result.voted_name,
             received_votes: result.received_votes_from,

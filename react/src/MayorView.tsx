@@ -45,7 +45,7 @@ export class MayorView extends React.Component<IProps & ISecretRoleProps> {
         <div className="mayor-container">
           <div className="mayor-info">
             <div>Du bist der Bürgermeister!</div>
-            <SecretRole role={this.props.role} other_werewolfes={this.props.other_werewolfes}/>
+            <SecretRole role={this.props.role} other_werewolves={this.props.other_werewolves}/>
             <div>Wähle dein Zauberwort:</div>
             <div>{words}</div>
           </div>

@@ -27,7 +27,7 @@ interface IGameProps {
 interface IPlayerProps {
   is_mayor: boolean;
   role: string;
-  other_werewolfes?: string[];
+  other_werewolves?: string[];
   voted_name?: string;
 }
 
@@ -78,18 +78,18 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
         {
           if (!this.props.words)
             console.warn("Have no words to choose from!");
-          return <MayorView words={this.props.words ?? []} role={this.props.role} other_werewolfes={this.props.other_werewolfes}/>
+          return <MayorView words={this.props.words ?? []} role={this.props.role} other_werewolves={this.props.other_werewolves}/>
         }
         return (
           <div>
             <div>Bürgermeister <b>{this.props.mayor}</b> wählt das Zauberwort aus.</div>
-            <SecretRole role={this.props.role} other_werewolfes={this.props.other_werewolfes}/>
+            <SecretRole role={this.props.role} other_werewolves={this.props.other_werewolves}/>
           </div>
         );
       case "main":
         return this.props.is_mayor ?
           <MayorView role={this.props.role} secret={secret} seconds_left={this.props.seconds_left}/> :
-          <GuessingView role={this.props.role} secret={secret} other_werewolfes={this.props.other_werewolfes}/>;
+          <GuessingView role={this.props.role} secret={secret} other_werewolves={this.props.other_werewolves}/>;
       case "vote": {
         return <VoteView secret={secret}
                          secret_found={this.props.secret_found === 1}

@@ -22,7 +22,7 @@ export class GuessingView extends React.Component<IProps & ISecretRoleProps> {
     }
     return (
       <>
-        <SecretRole role={this.props.role} other_werewolfes={this.props.other_werewolfes}/>
+        <SecretRole role={this.props.role} other_werewolves={this.props.other_werewolves}/>
         {instructions}
       </>
     );
