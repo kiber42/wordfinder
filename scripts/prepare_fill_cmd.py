@@ -19,6 +19,6 @@ except (FileNotFoundError, PermissionError):
     sys.exit(2)
 
 print("""USE [insert-database-name-here];
-SET NAMES 'utf8';
-SET CHARACTER SET utf8;""");
+SET NAMES 'utf8mb4';
+SET CHARACTER SET utf8mb4;""");
 print("INSERT INTO Words(word, difficulty) VALUES " + ", ".join('("{}",{})'.format(word, difficulty) for word in words) + ";")
