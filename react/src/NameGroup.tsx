@@ -16,4 +16,3 @@ export class NameGroup extends React.Component<IProps> {
     return <>{items.slice(0, -1).reduce((a, b) => <>{a}, {b}</>)} und {items.slice(-1)} {this.props.plural}</>
   }
 }
-
