@@ -49,6 +49,7 @@ export class App extends Component<IProps, IState> {
       is_valid: false,
       connected: false,
       error: "",
+      token: this.props.token,
       nickname: "",
       room_name: "",
       game_state: "",
