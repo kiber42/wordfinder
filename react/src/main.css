@@ -35,17 +35,17 @@
 }
 
 .seer-container:before {
-  content: ""
+  content: url('images/seer.svg');
 }
 
 .seer-container {
-  background-color: lightgreen;
+  background-color: #c5e6ce;
 }
 
 .villager-container:before {
-  content: ""
+  content: url('images/villager.svg');
 }
 
 .villager-container {
-  background-color: floralwhite;
+  background-color: #e6e4ae;
 }
