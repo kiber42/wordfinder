@@ -21,24 +21,22 @@ export class VoteView extends Component<IVoteViewProps & IVoteProps> {
   render() {
     const isWerewolf = this.props.role === "werewolf";
     const hasVote = !this.props.secret_found || isWerewolf;
-    const prompt : string = hasVote ?
-      (isWerewolf ?
-        "Finde die Seherin, um die Partie zu gewinnen!" :
-        "Stimmt jetzt darüber ab, wen ihr für den Werwolf haltet!") :
-      "Werwolf, finde die Seherin!";
+    const votePrompt : string = isWerewolf ?
+      "Finde die Seherin, um die Partie zu gewinnen!" :
+      "Stimmt jetzt darüber ab, wen ihr für den Werwolf haltet!";
     return (
     <>
-      (this.props.secret_found ?
+      {this.props.secret_found ?
         <div>Das Zauberwort <b>{this.props.secret}</b> wurde erraten!</div> :
         <div>Ihr habt das Zauberwort <b>{this.props.secret}</b> nicht gefunden!</div>
-      )
-      (hasVote ?
-        <Vote players={this.props.players} voted_name={this.props.voted_name}/> :
-        <div>
+      }
+      {hasVote ?
+        <div>{votePrompt}<Vote players={this.props.players} voted_name={this.props.voted_name}/></div> :
+        (<div>
           <NameGroup items={this.props.werewolf_names} singular="ist der Werwolf!" plural="sind die Werwölfe!"/>
-        </div>
-      )
-      <div>{prompt}</div>
+          <div>Werewolf, finde die Seherin!</div>
+        </div>)
+      }
       <div><Countdown seconds_initial={this.props.seconds_left}/></div>
     </>
     );
