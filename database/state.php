@@ -21,7 +21,6 @@ $link = $protocol . $_SERVER["HTTP_HOST"] . dirname($_SERVER["PHP_SELF"]) . "/?r
 $is_mayor = $player_id == $mayor_id;
 $response = ["nickname" => htmlspecialchars($nickname),
              "room_name" => htmlspecialchars($room_name),
-             "game_state" => $game_state,
              "difficulty" => (int)$difficulty,
              "num_werewolves" => (int)$num_werewolves,
              "player_role" => $role,
@@ -34,14 +33,10 @@ if ($secret_found !== null)
     $response["role_found"] = (int)$role_found;
 }
 
-// Adjust state to "waiting" when a player joined a room with an on-going game
-if ($role == null && $game_state != "lobby")
-    $game_state = $response["game_state"] = "waiting";
-
 // Find other players in room (either in game or waiting for next round)
 $team_query = "SELECT player_id, nickname FROM Players WHERE room_id = ${room_id} AND player_id != ${player_id}";
 $recent = " AND last_seen > ADDTIME(NOW(), -10)";
-if ($game_state == "lobby" or $game_state == "waiting")
+if ($game_state == "lobby")
 {
     $result = $sql->query($team_query . $recent);
     $response["players"] = $result->fetch_all();
@@ -141,6 +136,12 @@ if ($game_state != "lobby")
         }
     }
 }
+
+// Adjust state to "waiting" when a player joined a room with an on-going game
+if ($role == null && $game_state != "lobby")
+    $game_state = "waiting";
+
+$response["game_state"] = $game_state;
 
 $sql->query("UPDATE Players SET last_seen = NOW() WHERE player_id = ${player_id}");
 $sql->close();
