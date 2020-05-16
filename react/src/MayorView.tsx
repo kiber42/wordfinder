@@ -1,46 +1,75 @@
 import React from 'react';
 
 import { Connection } from './Context'
+import { SecretRole, ISecretRoleProps } from './SecretRole' // eslint-disable-line no-unused-vars
 
 import './main.css'
 
 interface IProps {
   role: string;
-  secret: string;
+  secret?: string;
+  words?: string[];
   seconds_left?: number;
 }
 
-export class MayorView extends React.Component<IProps> {
+export class MayorView extends React.Component<IProps & ISecretRoleProps> {
   static contextType = Connection;
 
-  render() {
-    let title = "der Bürgermeister";
-    let instructions = "Viel Erfolg!";
+  private getTitle() {
     switch (this.props.role) {
       case "werewolf":
-        title = "der Bürgermeister-Werwolf";
-        instructions = "Mache es den Ratern möglichst schwer, ohne dass sie dir auf die Schliche kommen!";
-        break;
+        return "der Bürgermeister-Werwolf";
       case "seer":
-        title = "die Bürgermeister-Seherin";
-        instructions = "Mache es den Ratern möglichst einfach, ohne dass der Werwolf dich erkennt!";
-        break;
+        return "die Bürgermeister-Seherin";
       default:
-        break;
+        return "der Bürgermeister";
     }
+  }
+
+  private getInstructions() {
+    switch (this.props.role) {
+      case "werewolf":
+        return "Mache es den Ratern möglichst schwer, ohne dass sie dir auf die Schliche kommen!";
+      case "seer":
+        return "Mache es den Ratern möglichst einfach, ohne dass der Werwolf dich erkennt!"
+      default:
+        return "Viel Erfolg!";
+    }
+  }
+
+  render() {
+    if (this.props.words)
+    {
+      const words = this.props.words.map((word, index) => <button onClick={() => this.choose_word(index)} key={index}>{word}</button>);
+      return (
+        <div className="mayor-container">
+          <div className="mayor-info">
+            <div>Du bist der Bürgermeister!</div>
+            <SecretRole role={this.props.role} other_werewolfes={this.props.other_werewolfes}/>
+            <div>Wähle dein Zauberwort:</div>
+            <div>{words}</div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <>
       <div className="mayor-container">
         <div className="mayor-info">
-          <div>Du bist {title}!</div>
+          <div>Du bist {this.getTitle()}!</div>
           <div>Die anderen müssen das Wort erraten, aber du darfst nur mit Ja, Nein, und Vielleicht antworten.</div>
           <div>Das Zauberwort ist: {this.props.secret}</div>
-          <div>{instructions}</div>
+          <div>{this.getInstructions()}</div>
           <button onClick={() => this.secret_found()}>Das Wort wurde erraten!</button>
         </div>
       </div>
       </>
     );
+  }
+
+  choose_word(index) {
+    fetch("choose.php?token=" + this.context.token + "&index=" + index).then().catch(err => console.error(err));
   }
 
   secret_found() {

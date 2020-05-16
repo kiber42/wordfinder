@@ -8,7 +8,6 @@ import { ResultView } from './Results'
 import { SecretRole } from './SecretRole'
 import { VoteView } from './Voting'
 import { WaitView } from './WaitView'
-import { WordChoice } from './WordChoice'
 
 interface IGameProps {
   state: string;
@@ -79,7 +78,7 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
         {
           if (!this.props.words)
             console.warn("Have no words to choose from!");
-          return <WordChoice words={this.props.words ?? []} role={this.props.role} other_werewolfes={this.props.other_werewolfes}/>
+          return <MayorView words={this.props.words ?? []} role={this.props.role} other_werewolfes={this.props.other_werewolfes}/>
         }
         return (
           <div>
