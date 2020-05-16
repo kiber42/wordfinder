@@ -1,16 +1,14 @@
 import React from 'react'
 
 import { Countdown } from './Countdown'
-import { SecretRole } from './SecretRole'
+import { SecretRole, ISecretRoleProps } from './SecretRole'
 
 interface IProps {
-  role: string;
   secret?: string;
-  other_werewolfes: string[];
   seconds_left: number;
 }
 
-export class GuessingView extends React.Component<IProps> {
+export class GuessingView extends React.Component<IProps & ISecretRoleProps> {
   render() {
     const secret = <div>Das Zauberwort ist: {this.props.secret}</div>;
     let instructions;

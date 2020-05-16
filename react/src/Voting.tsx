@@ -13,7 +13,7 @@ interface IVoteViewProps {
 }
 
 interface IVoteProps {
-  players: string[];
+  players: [number, string][];
   voted_name?: string;
 }
 
@@ -34,7 +34,9 @@ export class VoteView extends Component<IVoteViewProps & IVoteProps> {
       )
       (hasVote ?
         <Vote players={this.props.players} voted_name={this.props.voted_name}/> :
-        <div><NameGroup items={this.props.werewolf_names} singular="ist der Werwolf" plural="sind die Werwölfe"/>!</div>
+        <div>
+          <NameGroup items={this.props.werewolf_names} singular="ist der Werwolf!" plural="sind die Werwölfe!"/>
+        </div>
       )
       <div>{prompt}</div>
       <div><Countdown seconds_initial={this.props.seconds_left}/></div>
@@ -47,9 +49,10 @@ class Vote extends Component<IVoteProps> {
   static contextType = Connection;
 
   render() {
-    if (this.props.voted_name !== undefined)
+    if (!!this.props.voted_name)
       return <div>Du hast für <b>{this.props.voted_name}</b> gestimmt. Warte auf andere Spieler.</div>
-    const choices = this.props.players.map((item) => <button onClick={() => this.choose(item[0])} key={item[0]}>{item[1]}</button>);
+    const choices = this.props.players.map((player) =>
+      <button onClick={() => this.choose(player[0])} key={player[0]}>{player[1]}</button>);
     return <div>{choices}</div>
   }
 

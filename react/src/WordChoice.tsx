@@ -2,16 +2,14 @@ import React from 'react'
 
 import { Connection } from './Context'
 import { Countdown } from './Countdown'
-import { SecretRole } from './SecretRole'
+import { SecretRole, ISecretRoleProps } from './SecretRole'
 
 interface IProps {
-  role: string;
-  other_werewolfes: string[];
   words: string[];
   seconds_left: number;
 }
 
-export class WordChoice extends React.Component<IProps> {
+export class WordChoice extends React.Component<IProps & ISecretRoleProps> {
   static contextType = Connection;
 
   render() {

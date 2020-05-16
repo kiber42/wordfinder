@@ -4,10 +4,10 @@ import copy from 'copy-to-clipboard'
 import { Connection } from './Context'
 
 interface LobbyViewProps {
-  difficulty: number,
-  invite_link: string,
-  num_players: number,
-  num_werewolves: number
+  difficulty: number;
+  invite_link: string;
+  num_players: number;
+  num_werewolves: number;
 }
 
 class LobbyView extends Component<LobbyViewProps> {

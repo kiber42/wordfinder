@@ -9,6 +9,6 @@ const token = Number(search.token instanceof Array ? search.token[0] : search.to
 const room_name = search.room_name instanceof Array ? search.room_name[0] : search.room_name;
 
 ReactDOM.render(
-  <App token={token} room_name={room_name}/>,
+  <App token={token} room_name={room_name ?? undefined}/>,
   document.getElementById('root')
 );

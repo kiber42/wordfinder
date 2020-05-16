@@ -20,8 +20,8 @@ interface IState {
   nickname: string;
   room_name: string;
   game_state: string;
-  players: string[];
-  players_waiting?: string[];
+  players: [number, string][];
+  players_waiting?: [number, string][];
   player_role: string;
   is_mayor: boolean;
   mayor?: string;
@@ -34,7 +34,7 @@ interface IState {
   other_werewolfes?: string[];
   seer_name?: string;
   voted_name?: string;
-  received_votes?: any;
+  received_votes?: [string, string[]][];
   seconds_left?: number;
   invite_link: string;
 }
@@ -73,9 +73,11 @@ export class App extends Component<IProps, IState> {
       return <Login room_name={this.props.room_name} tokenAvailable={this.enterRoom.bind(this)}/>
 
     if (this.state.is_valid) {
+      const active_players = this.state.players.map((player) => player[1]);
+      const waiting_players = this.state.players_waiting ? this.state.players_waiting.map((player) => player[1]) : [];
       let items = <>
           <Welcome name={this.state.nickname} room={this.state.room_name}/>
-          <Teammates active={this.state.players} waiting={this.state.players_waiting}/>
+          <Teammates active={active_players} waiting={waiting_players}/>
           <GameView state={this.state.game_state}
                     role={this.state.player_role}
                     is_mayor={this.state.is_mayor}
@@ -92,7 +94,7 @@ export class App extends Component<IProps, IState> {
                     received_votes={this.state.received_votes}
                     players={this.state.players}
                     num_players={this.state.players.length + 1}
-                    seconds_left={this.state.seconds_left}
+                    seconds_left={this.state.seconds_left ?? 0}
                     invite_link={this.state.invite_link}/>
       </>
       if (!this.state.connected)
@@ -175,7 +177,7 @@ export class App extends Component<IProps, IState> {
         {
           this.setState({is_valid: false, error: result.error});
           if (result.error === "Invalid token.")
-            this.setState({token: null});
+            this.setState({token: undefined});
           else
             setTimeout((this.refresh.bind(this) as TimerHandler), 3000);
         }
@@ -202,19 +204,19 @@ class Welcome extends Component<IWelcomeProps> {
 
 interface ITeamProps {
   active: string[];
-  waiting: string[];
+  waiting?: string[];
 }
 
 class Teammates extends Component<ITeamProps> {
   render() {
-    const names = this.props.active.map((item) => item[1]).join(", ");
+    const names = this.props.active.join(", ");
     if (this.props.waiting === undefined)
     { // in lobby / waiting for game to finish
       if (this.props.active.length === 0)
         return <div>Du bist alleine im Raum.</div>
       return <div>Mit dir im Raum: {names}</div>;
     }
-    const waiting = this.props.waiting.map((item) => item[1]).join(", ");
+    const waiting = this.props.waiting.join(", ");
     if (this.props.active.length === 0)
     { 
       if (this.props.waiting.length === 0)

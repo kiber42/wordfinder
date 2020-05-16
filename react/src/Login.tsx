@@ -1,14 +1,14 @@
 import React from 'react'
 
 interface IProps {
-  room_name: string;
+  room_name?: string;
   tokenAvailable: (room_name: string, assignedToken: number) => void;
 }
 
 interface IState {
   room_name: string;
   nickname: string;
-  message: string;
+  message?: string;
 }
 
 export class Login extends React.Component<IProps, IState> {
@@ -18,16 +18,16 @@ export class Login extends React.Component<IProps, IState> {
 
   constructor(props) {
     super(props);
-    this.state = {room_name: this.props.room_name ?? "", nickname: "", message: null};
+    this.state = {room_name: this.props.room_name ?? "", nickname: "", message: undefined};
     if (!this.props.room_name)
       this.getNameSuggestion();
 
     this.roomChanged = (event) => this.setState({room_name: event.target.value});
-    this.nameChanged = (event) => this.setState({nickname: event.target.value, message: null});
+    this.nameChanged = (event) => this.setState({nickname: event.target.value, message: undefined});
     this.handleSubmit = (event) => {
       if (!!this.state.room_name && !!this.state.nickname)
       {
-        this.setState({message: null});
+        this.setState({message: undefined});
         fetch("join.php?room_name=" + this.state.room_name + "&nickname=" + this.state.nickname)
         .then(res => res.json())
         .then(res => {

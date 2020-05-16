@@ -6,7 +6,7 @@ interface IResultViewProps {
   winner: string;
   werewolf_names: string[];
   seer_name: string;
-  received_votes: any;
+  received_votes?: [string, string[]][];
 }
 
 export class ResultView extends Component<IResultViewProps> {
@@ -24,7 +24,7 @@ export class ResultView extends Component<IResultViewProps> {
     return (
       <div>
         <div>Die Runde ist zu Ende:</div>
-        <VoteResults received_votes={this.props.received_votes}/>
+        (this.props.received_votes && <VoteResults received_votes={(this.props.received_votes as [string, string[]][])}/>)
         <div><b>{this.props.seer_name}</b> war die Seherin.</div>
         {winner}
       </div>
@@ -33,7 +33,7 @@ export class ResultView extends Component<IResultViewProps> {
 }
 
 interface IVoteResults {
-  received_votes: any
+  received_votes: [string, string[]][];
 }
 
 class VoteResults extends Component<IVoteResults> {

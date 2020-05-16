@@ -2,12 +2,12 @@ import React from 'react'
 
 import { NameGroup } from './NameGroup'
 
-interface IProps {
+export interface ISecretRoleProps {
   role: string;
-  other_werewolfes: string[];
+  other_werewolfes?: string[];
 }
 
-export class SecretRole extends React.Component<IProps> {
+export class SecretRole extends React.Component<ISecretRoleProps> {
   render() {
     const message = "Deine geheime Rolle:";
     switch (this.props.role)
@@ -16,7 +16,7 @@ export class SecretRole extends React.Component<IProps> {
         return (
           <>
             <div>{message} <b>Werwolf</b>!</div>
-            {this.props.other_werewolfes &&
+            {this.props.other_werewolfes !== undefined && this.props.other_werewolfes.length > 0 &&
               <div><NameGroup items={this.props.other_werewolfes} singular="ist auch ein Werwolf." plural="sind auch Werwölfe."/></div>}
           </>
         );
