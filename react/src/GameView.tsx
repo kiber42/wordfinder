@@ -52,7 +52,7 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
     const secret = this.props.words !== undefined ? this.props.words[0] : "";
     switch (this.props.state)
     {
-      case "lobby":
+      case "lobby": {
         // Lobby is also used to show results of previous game
         const lobby = <LobbyView num_players={this.props.num_players}
                                  difficulty={this.props.difficulty}
@@ -71,6 +71,7 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
           );
         }
         return lobby;
+      }
       case "choosing":
         if (this.props.is_mayor)
         {

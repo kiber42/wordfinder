@@ -36,7 +36,7 @@ class LobbyView extends Component<LobbyViewProps> {
 
 interface DifficultyProps {
   current: number
-};
+}
 
 class Difficulty extends Component<DifficultyProps> {
   static contextType = Connection;
@@ -45,7 +45,7 @@ class Difficulty extends Component<DifficultyProps> {
 
   render() {
     const choices = Difficulty.levels.map((level, index) =>
-      <label><input type='radio' checked={index===this.props.current} onClick={() => this.setDifficulty(index)} key={index} />{level}</label>);
+      <label key={index}><input type='radio' checked={index===this.props.current} onClick={() => this.setDifficulty(index)} />{level}</label>);
     return <div>Schwierigkeit: {choices}</div>
   }
 
@@ -57,14 +57,14 @@ class Difficulty extends Component<DifficultyProps> {
 interface NumWerewolvesProps {
   current: number,
   num_players: number
-};
+}
 
 class NumWerewolves extends Component<NumWerewolvesProps> {
   static contextType = Connection;
 
   render() {
     const choices = [1, 2].map(n =>
-      <label><input type='radio' checked={n===this.props.current} onClick={() => this.setNumber(n)} key={n} />{n}</label>);
+      <label key={n}><input type='radio' checked={n===this.props.current} onClick={() => this.setNumber(n)} />{n}</label>);
     const recommended = this.props.num_players <= 6 ? 1 : 2;
     return <div>Anzahl Werwölfe: {choices} (empfohlen: {recommended})</div>
   }
@@ -76,7 +76,7 @@ class NumWerewolves extends Component<NumWerewolvesProps> {
 
 interface InviteProps {
   link: string
-};
+}
 
 class Invite extends Component<InviteProps> {
   render() {

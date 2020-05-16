@@ -31,7 +31,7 @@ export class Login extends React.Component<IProps, IState> {
         fetch("join.php?room_name=" + this.state.room_name + "&nickname=" + this.state.nickname)
         .then(res => res.json())
         .then(res => {
-          if (!!res.token) this.props.tokenAvailable(this.state.room_name, res.token);
+          if (res.token) this.props.tokenAvailable(this.state.room_name, res.token);
           else if (res.token === 0) this.setState({message: "Dieser Name ist bereits vergeben."});
         })
         .catch(err => console.error(err));

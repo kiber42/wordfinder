@@ -94,7 +94,7 @@ export class App extends Component<IProps, IState> {
                     received_votes={this.state.received_votes}
                     players={this.state.players}
                     num_players={this.state.players.length + 1}
-                    seconds_left={this.state.seconds_left ?? 0}
+                    seconds_left={this.state.seconds_left}
                     invite_link={this.state.invite_link}/>
       </>
       if (!this.state.connected)
@@ -134,7 +134,7 @@ export class App extends Component<IProps, IState> {
     .then(result => result.json())
     .catch((err) => {
       this.refresh_timer = setTimeout((this.refresh.bind(this)) as TimerHandler, 2000);
-      throw new Error("Could not reach server");
+      throw new Error("Could not reach server " + err.toString());
     })
     .then(
       result => {

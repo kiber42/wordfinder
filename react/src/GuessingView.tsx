@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { SecretRole, ISecretRoleProps } from './SecretRole'
+import { SecretRole, ISecretRoleProps } from './SecretRole' // eslint-disable-line no-unused-vars
 
 interface IProps {
   secret?: string;

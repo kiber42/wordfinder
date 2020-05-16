@@ -44,7 +44,7 @@ class Vote extends Component<IVoteProps> {
   static contextType = Connection;
 
   render() {
-    if (!!this.props.voted_name)
+    if (this.props.voted_name)
       return <div>Du hast für <b>{this.props.voted_name}</b> gestimmt. Warte auf andere Spieler.</div>
     const choices = this.props.players.map((player) =>
       <button onClick={() => this.choose(player[0])} key={player[0]}>{player[1]}</button>);
