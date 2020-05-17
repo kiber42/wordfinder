@@ -2,6 +2,40 @@ import React, { Component } from 'react'
 
 import { NameGroup } from './NameGroup'
 
+export interface ISecretRoleCardProps {
+  role: string;
+  is_mayor: boolean;
+}
+
+export class SecretRoleCard extends Component<ISecretRoleCardProps> {
+  getTitle() {
+    switch (this.props.role)
+    {
+      case "werewolf": return "Werwolf";
+      case "seer": return "Seherin"
+      case "villager": return "Dorfbewohner";
+      default: return null;
+    }
+  }
+
+  render() {
+    if (this.props.is_mayor && this.props.role !== "villager")
+    {
+      return null;
+    }
+
+    const tag = this.props.is_mayor ? "mayor" : this.props.role;
+    return (
+      <div className="secret-role">
+        <div className={tag + " card"}/>
+        <div className="role-label">
+          {this.getTitle()}
+        </div>
+      </div>
+    );
+  }
+}
+
 export interface ISecretRoleProps extends IOtherWerewolvesProps {
   role: string;
 }

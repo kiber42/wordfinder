@@ -4,7 +4,7 @@ import { GuessingView } from './GuessingView'
 import { LobbyView } from './Lobby'
 import { MayorView } from './MayorView'
 import { ResultView } from './Results'
-import { SecretRole } from './SecretRole'
+import { SecretRole, SecretRoleCard } from './SecretRole'
 import { VoteView } from './Voting'
 import { WaitView } from './WaitView'
 
@@ -39,6 +39,17 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
   //       (here or in a component further down the hierarchy)
 
   render() {
+    if (this.props.role !== undefined)
+      return (
+        <div className={"player-container " + this.props.role}>
+          <SecretRoleCard role={this.props.role} is_mayor={this.props.is_mayor}/>
+          {this.getMainContent()}
+        </div>
+      );
+    return this.getMainContent();
+  }
+
+  private getMainContent() : JSX.Element {
     const secret = this.props.words !== undefined ? this.props.words[0] : "";
     switch (this.props.state)
     {

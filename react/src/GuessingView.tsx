@@ -20,12 +20,9 @@ export class GuessingView extends React.Component<IProps & ISecretRoleProps> {
 
   render() {
     return (
-      <div className={"player-container " + this.props.role + "-container"}>
-        <div className="player-info">
-          {this.props.secret && <div>Das Zauberwort ist: {this.props.secret}</div>}
-          <SecretRole role={this.props.role} other_werewolves={this.props.other_werewolves}/>
-          {this.getInstructions()}
-        </div>
+      <div className="player-info">
+        {this.props.secret && <div>Das Zauberwort ist: <b>{this.props.secret}</b></div>}
+        <div>{this.getInstructions()}</div>
       </div>
     );
   }
