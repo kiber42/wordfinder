@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 
 import { Connection } from './Context'
 
+import { Countdown } from './Countdown'
 import { GameView } from './GameView'
 import { Login } from './Login'
 
@@ -92,8 +93,9 @@ export class App extends Component<IProps, IState> {
                     received_votes={this.state.received_votes}
                     players={this.state.players}
                     num_players={this.state.players.length + 1}
-                    seconds_left={this.state.seconds_left}
                     invite_link={this.state.invite_link}/>
+          <Countdown seconds_initial={this.state.seconds_left}/>
+
       </>
       if (!this.state.connected)
         items = <>{items}<div>No connection to server!</div></>

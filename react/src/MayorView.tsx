@@ -9,7 +9,6 @@ interface IProps {
   role: string;
   secret?: string;
   words?: string[];
-  seconds_left?: number;
 }
 
 export class MayorView extends React.Component<IProps & ISecretRoleProps> {

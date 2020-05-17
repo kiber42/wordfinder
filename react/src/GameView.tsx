@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { Countdown } from './Countdown'
 import { GuessingView } from './GuessingView'
 import { LobbyView } from './Lobby'
 import { MayorView } from './MayorView'
@@ -21,7 +20,6 @@ interface IGameProps {
   werewolf_names?: string[];
   seer_name?: string;
   received_votes?: [string, string[]][];
-  seconds_left?: number;
 }
 
 interface IPlayerProps {
@@ -41,15 +39,6 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
   //       (here or in a component further down the hierarchy)
 
   render() {
-    return (
-      <>
-        {this.getContent()}
-        <Countdown seconds_initial={this.props.seconds_left}/>
-      </>
-    );
-  }
-
-  getContent() : JSX.Element {
     const secret = this.props.words !== undefined ? this.props.words[0] : "";
     switch (this.props.state)
     {
@@ -88,7 +77,7 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
         );
       case "main":
         return this.props.is_mayor ?
-          <MayorView role={this.props.role} secret={secret} seconds_left={this.props.seconds_left}/> :
+          <MayorView role={this.props.role} secret={secret}/> :
           <GuessingView role={this.props.role} secret={secret} other_werewolves={this.props.other_werewolves}/>;
       case "vote": {
         return <VoteView secret={secret}
