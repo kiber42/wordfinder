@@ -32,7 +32,7 @@ export class VoteView extends Component<IVoteViewProps & IVoteProps> {
         <div>{votePrompt}<Vote players={this.props.players} voted_name={this.props.voted_name}/></div> :
         (<div>
           <NameGroup items={this.props.werewolf_names} singular="ist der Werwolf!" plural="sind die Werwölfe!"/>
-          <div>Werewolf, finde die Seherin!</div>
+          <div>Werwolf, finde die Seherin!</div>
         </div>)
       }
     </>
