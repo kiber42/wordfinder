@@ -3,8 +3,6 @@ import React from 'react';
 import { Connection } from './Context'
 import { SecretRole, ISecretRoleProps } from './SecretRole' // eslint-disable-line no-unused-vars
 
-import './main.css'
-
 interface IProps {
   role: string;
   secret?: string;

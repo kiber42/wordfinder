@@ -4,6 +4,8 @@ import queryString from 'query-string';
 
 import { App } from './App';
 
+import './main.scss'
+
 const search = queryString.parse(window.location.search);
 const token = Number(search.token instanceof Array ? search.token[0] : search.token);
 const room_name = search.room_name instanceof Array ? search.room_name[0] : search.room_name;
