@@ -1,56 +1,75 @@
-.mayor-container:before {
-  content: url('images/mayor.svg');
-}
-
-.mayor-container {
-  background-color: #92abd3;
-}
-
-
 .player-container {
   display: flex;
-  flex-direction: row;
+  flex-flow: row nowrap;
+  align-items: center;
   padding: 1rem;
+
+  &.villager { background-color: #e6e4ae; }
+  &.werewolf { background-color: #df9a99; }
+  &.seer     { background-color: #c5e6ce; }
+  &.mayor    { background-color: #bae1bc; }
+  &.werewolf-mayor {
+    background: linear-gradient(
+      to bottom right,
+      #bae1bc,
+      #df9a99
+    );
+  }
+  &.seer-mayor {
+    background: repeating-linear-gradient(
+      -45deg,
+      #bae1bc 0px,
+      #bae1bc 25px,
+      #c5e6ce 25px,
+      #c5e6ce 50px
+    );
+  }
 }
 
-.werewolf {
-  background-color: #df9a99;
-}
-
-.seer {
-  background-color: #c5e6ce;
-}
-
-.villager {
-  background-color: #e6e4ae;
-}
-
-.secret-role {
+.role {
   display: inline-flex;
   flex-direction: column;
-  
   align-items: center;
 
   .card {
-    width: 9.2rem;
-    height: 12.75rem;
-    margin-bottom: 1rem;
+    &.regular {
+      width: 9.2rem;
+      height: 12.75rem;
+      margin-bottom: 1rem;
+    }
+    &.special {
+      width: 6.9rem;
+      height: 9.56rem;
+      margin: 0 0.25rem 0.5rem 0.25rem;
+    }
+
+    &.villager { content: url('images/villager.svg'); }
+    &.werewolf { content: url('images/werewolf.svg'); }
+    &.seer     { content: url('images/seer.svg'); }
+    &.mayor    { content: url('images/mayor.svg'); }
   }
-  .card.werewolf {
-    content: url('images/werewolf.svg');
-  }
-  .card.seer {
-    content: url('images/seer.svg');
-  }
-  .card.villager {
-    content: url('images/villager.svg');
+
+  .special-mayor {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
   }
 
   .role-label {
     font-weight: bold;
+    text-align: center;
   }
 }
 
 .player-info {
   margin-left: 0.5rem;
+}
+
+.secret-message {
+  font-style: italic;
+}
+
+.secret {
+  font-weight: bold;
+  display: inline;
 }

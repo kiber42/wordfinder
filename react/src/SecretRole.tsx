@@ -8,26 +8,34 @@ export interface ISecretRoleCardProps {
 }
 
 export class SecretRoleCard extends Component<ISecretRoleCardProps> {
-  getTitle() {
+  private getTitle() {
     switch (this.props.role)
     {
-      case "werewolf": return "Werwolf";
-      case "seer": return "Seherin"
-      case "villager": return "Dorfbewohner";
+      case "werewolf": return this.props.is_mayor ? "Bürgermeister-Werwolf" : "Werwolf";
+      case "seer": return this.props.is_mayor ? "Bürgermeister-Seherin" : "Seherin";
+      case "villager": return this.props.is_mayor ? "Bürgermeister" : "Dorfbewohner";
       default: return null;
     }
   }
 
-  render() {
-    if (this.props.is_mayor && this.props.role !== "villager")
-    {
-      return null;
+  private getCard() {
+    if (this.props.is_mayor && this.props.role !== "villager") {
+      return (
+        <div className="special-mayor">
+          <div className="mayor card special"/>
+          <div className={this.props.role + " card special"}/>
+        </div>
+      );
     }
 
     const tag = this.props.is_mayor ? "mayor" : this.props.role;
+    return <div className={tag + " card regular"}/>
+  }
+
+  render() {
     return (
-      <div className="secret-role">
-        <div className={tag + " card"}/>
+      <div className="role">
+        {this.getCard()}
         <div className="role-label">
           {this.getTitle()}
         </div>
