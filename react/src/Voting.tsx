@@ -23,10 +23,10 @@ export class VoteView extends Component<IVoteViewProps & IVoteProps> {
       "Finde die Seherin, um die Partie zu gewinnen!" :
       "Stimmt jetzt darüber ab, wen ihr für den Werwolf haltet!";
     return (
-    <>
+    <div className="player-info">
       {this.props.secret_found ?
-        <div>Das Zauberwort <b>{this.props.secret}</b> wurde erraten!</div> :
-        <div>Ihr habt das Zauberwort <b>{this.props.secret}</b> nicht gefunden!</div>
+        <div className="secret-message">Das Zauberwort <div className="secret">{this.props.secret}</div> wurde erraten!</div> :
+        <div className="secret-message">Ihr habt das Zauberwort <div className="secret">{this.props.secret}</div> nicht gefunden!</div>
       }
       {hasVote ?
         <div>{votePrompt}<Vote other_players={this.props.other_players} voted_name={this.props.voted_name}/></div> :
@@ -35,7 +35,7 @@ export class VoteView extends Component<IVoteViewProps & IVoteProps> {
           <div>Werwolf, finde die Seherin!</div>
         </div>)
       }
-    </>
+    </div>
     );
   }
 }
