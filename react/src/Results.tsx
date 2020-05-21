@@ -3,8 +3,8 @@ import React, { Component } from 'react'
 import { NameGroup } from './NameGroup'
 
 interface IResultViewProps {
-  secret_found: boolean;
-  role_found: boolean;
+  secret_found?: number;
+  role_found?: number;
   werewolf_names: string[];
   seer_name: string;
   received_votes?: { [votee: string] : string[] };
@@ -14,7 +14,7 @@ export class ResultView extends Component<IResultViewProps> {
   private getWinnerMessage() {
     // Secret found and seer found => Werewolf wins
     // Secret not found and wolf not found => Werewolf wins
-    if (this.props.secret_found === this.props.role_found) {
+    if (!!this.props.secret_found === !!this.props.role_found) {
       return <div>Werwolf <NameGroup items={this.props.werewolf_names} singular="hat" plural="haben"/> gewonnen!</div>
     }
     return (
@@ -26,6 +26,8 @@ export class ResultView extends Component<IResultViewProps> {
   }
 
   render() {
+    if (this.props.secret_found === undefined || this.props.role_found === undefined)
+      return null;
     return (
       <div>
         <div>Die Runde ist zu Ende:</div>
