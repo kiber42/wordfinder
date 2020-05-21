@@ -56,6 +56,11 @@ export class TestGameView extends React.Component<ISettings, ISettings> {
       num_werewolves={1}
       other_werewolves={other_werewolves}
       words={words}
+      secret_found={1}
+      role_found={0}
+      werewolf_names={["Trick", "Track"]}
+      seer_name="Gundula"
+      received_votes={{"X": ["Y"]}}
       />
 
     const states = ["lobby", "choosing", "main", "vote", "waiting"].map((state, index) =>

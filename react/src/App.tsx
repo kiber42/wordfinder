@@ -33,7 +33,7 @@ interface IState {
   other_werewolves?: string[];
   seer_name?: string;
   voted_name?: string;
-  received_votes?: [string, string[]][];
+  received_votes?: { [votee: string] : string[] };
   seconds_left?: number;
   invite_link: string;
 }

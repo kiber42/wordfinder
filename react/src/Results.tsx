@@ -6,7 +6,7 @@ interface IResultViewProps {
   winner: string;
   werewolf_names: string[];
   seer_name: string;
-  received_votes?: [string, string[]][];
+  received_votes?: { [votee: string] : string[] };
 }
 
 export class ResultView extends Component<IResultViewProps> {
@@ -33,7 +33,7 @@ export class ResultView extends Component<IResultViewProps> {
 }
 
 interface IVoteResults {
-  received_votes: [string, string[]][];
+  received_votes: { [votee: string] : string[] };
 }
 
 class VoteResults extends Component<IVoteResults> {

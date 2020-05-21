@@ -19,7 +19,7 @@ interface IGameProps {
   mayor?: string;
   werewolf_names?: string[];
   seer_name?: string;
-  received_votes?: [string, string[]][];
+  received_votes?: { [votee: string] : string[] };
 }
 
 interface IPlayerProps {
