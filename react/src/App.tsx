@@ -15,11 +15,6 @@ interface IProps {
   room_name?: string;
 }
 
-interface ISettings {
-  difficulty: number;
-  num_werewolves: number;
-}
-
 interface IState {
   is_valid: boolean;
   connected: boolean;
@@ -47,7 +42,12 @@ interface IState {
   invite_link: string;
 }
 
-export class App extends Component<IProps & ISettings, IState> {
+interface ISettings {
+  difficulty: number;
+  num_werewolves: number;
+}
+
+export class App extends Component<IProps, IState & ISettings> {
   private refresh_timer?: number;
   private timeout_timer?: number;
 
@@ -106,9 +106,7 @@ export class App extends Component<IProps & ISettings, IState> {
                       secret_found={this.state.secret_found}
                       werewolf_names={this.state.werewolf_names}
                       other_werewolves={this.state.other_werewolves}
-                      seer_name={this.state.seer_name}
                       voted_name={this.state.voted_name}
-                      received_votes={this.state.received_votes}
                       other_players={this.state.players}/>
           );
     }

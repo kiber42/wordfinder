@@ -8,12 +8,10 @@ import { VoteView } from './Voting'
 interface IGameProps {
   state: "choosing" | "main" | "vote";
   other_players: [number, string][];
-  words: string[];
+  words?: string[];
   secret_found?: number;
   mayor: string;
   werewolf_names?: string[];
-  seer_name?: string;
-  received_votes?: { [votee: string] : string[] };
 }
 
 interface IPlayerProps {
@@ -37,7 +35,7 @@ export class GameView extends React.Component<IGameProps & IPlayerProps> {
   }
 
   private getMainContent() {
-    const secret = this.props.words.length > 0 ? this.props.words[0] : "";
+    const secret = this.props.words !== undefined && this.props.words.length > 0 ? this.props.words[0] : "";
     switch (this.props.state)
     {
       case "choosing":
@@ -49,7 +47,7 @@ export class GameView extends React.Component<IGameProps & IPlayerProps> {
           <MayorView role={this.props.role} secret={secret} other_werewolves={this.props.other_werewolves}/> :
           <GuessingView mayor={this.props.mayor} has_chosen={true} role={this.props.role} secret={secret} other_werewolves={this.props.other_werewolves}/>
       case "vote":
-        return <VoteView secret={secret ?? ""}
+        return <VoteView secret={secret}
                          secret_found={this.props.secret_found === 1}
                          role={this.props.role}
                          werewolf_names={this.props.werewolf_names ?? []}

@@ -3,7 +3,7 @@ import React from 'react'
 import { GameView } from '../GameView'
 
 interface ISettings {
-  state: string;
+  state: "choosing" | "main" | "vote";
   role: string;
   is_mayor: boolean;
 }
@@ -23,11 +23,6 @@ export class TestGameView extends React.Component<ISettings, ISettings> {
     let is_mayor = this.state.is_mayor;
     let words : string[] | undefined;
     switch (this.state.state) {
-      case "lobby":
-      case "waiting":
-        role = "";
-        is_mayor = false;
-        break;
       case "choosing":
         if (this.state.is_mayor)
           words = ["geheim", "streng geheim", "unheimlich"];
@@ -36,7 +31,7 @@ export class TestGameView extends React.Component<ISettings, ISettings> {
         if (this.state.is_mayor || role !== "villager")
           words = ["geheim"];
         break;
-      case "voting":
+      case "vote":
         words = ["geheim"];
     }
 
@@ -46,26 +41,19 @@ export class TestGameView extends React.Component<ISettings, ISettings> {
 
     const gameView = <GameView
       state={this.state.state}
-      invite_link=""
-      num_players={4}
       other_players={[[1, "X"], [2, "Y"], [3, "Z"]]}
       is_mayor={is_mayor}
       mayor="Dieter"
       role={role}
-      difficulty={1}
-      num_werewolves={1}
       other_werewolves={other_werewolves}
       words={words}
       secret_found={1}
-      role_found={0}
       werewolf_names={["Trick", "Track"]}
-      seer_name="Gundula"
-      received_votes={{"X": ["Y"]}}
       />
 
-    const states = ["lobby", "choosing", "main", "vote", "waiting"].map((state, index) =>
+    const states = ["choosing", "main", "vote"].map((state, index) =>
         <label key={index}><input type='radio' checked={state===this.state.state}
-               onClick={() => this.setState({state: state})} />{state}</label>);
+               onClick={() => this.setState({state: state as any})} />{state}</label>);
     const roles = ["villager", "werewolf", "seer"].map((role, index) =>
         <label key={index}><input type='radio' checked={role===this.state.role}
                onClick={() => this.setState({role: role})} />{role}</label>);
