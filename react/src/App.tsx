@@ -91,7 +91,7 @@ export class App extends Component<IProps, IState> {
                     seer_name={this.state.seer_name}
                     voted_name={this.state.voted_name}
                     received_votes={this.state.received_votes}
-                    players={this.state.players}
+                    other_players={this.state.players}
                     num_players={this.state.players.length + 1}
                     invite_link={this.state.invite_link}/>
           <Countdown seconds_initial={this.state.seconds_left}/>

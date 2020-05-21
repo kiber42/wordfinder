@@ -12,7 +12,7 @@ interface IGameProps {
   state: string;
   invite_link: string;
   num_players: number;
-  players: [number, string][];
+  other_players: [number, string][];
   words?: string[];
   secret_found?: number;
   role_found?: number;
@@ -88,7 +88,7 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
                          role={this.props.role}
                          werewolf_names={this.props.werewolf_names ?? []}
                          voted_name={this.props.voted_name}
-                         players={this.props.players}/>
+                         other_players={this.props.other_players}/>
       }
       case "waiting":
         return <WaitView/>
