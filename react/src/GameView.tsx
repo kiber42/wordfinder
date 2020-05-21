@@ -39,19 +39,29 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
   //       (here or in a component further down the hierarchy).
   //       Also make sure that others are not set (e.g. secret word, other werewolves, or time left if these are not supposed to be available)
 
+  private getMayorAndRoleTag() {
+    if (!this.props.is_mayor)
+      return this.props.role;
+    if (this.props.role === "villager")
+      return "mayor";
+    return this.props.role + "-mayor";
+  }
+
   render() {
     if (this.props.role !== undefined)
+    {
       return (
-        <div className={"player-container " + this.props.role}>
+        <div className={"player-container " + this.getMayorAndRoleTag()}>
           <SecretRoleCard role={this.props.role} is_mayor={this.props.is_mayor}/>
           {this.getMainContent()}
         </div>
       );
+    }
     return this.getMainContent();
   }
 
   private getMainContent() : JSX.Element {
-    const secret = this.props.words !== undefined ? this.props.words[0] : "";
+    const secret = this.props.words !== undefined ? this.props.words[0] : undefined;
     switch (this.props.state)
     {
       case "lobby": {
@@ -77,19 +87,18 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
       case "choosing":
         return this.props.is_mayor ?
           <MayorView role={this.props.role} words={this.props.words} other_werewolves={this.props.other_werewolves}/> :
-          <div className="player-info">Bürgermeister <b>{this.props.mayor}</b> wählt das Zauberwort aus.</div>
+          <GuessingView mayor={this.props.mayor ?? ""} has_chosen={false} role={this.props.role} other_werewolves={this.props.other_werewolves}/>
       case "main":
         return this.props.is_mayor ?
-          <MayorView role={this.props.role} words={this.props.words} secret={secret} other_werewolves={this.props.other_werewolves}/> :
-          <GuessingView role={this.props.role} secret={secret} other_werewolves={this.props.other_werewolves}/>;
-      case "vote": {
-        return <VoteView secret={secret}
+          <MayorView role={this.props.role} secret={secret} other_werewolves={this.props.other_werewolves}/> :
+          <GuessingView mayor={this.props.mayor ?? ""} has_chosen={true} role={this.props.role} secret={secret} other_werewolves={this.props.other_werewolves}/>
+      case "vote":
+        return <VoteView secret={secret ?? ""}
                          secret_found={this.props.secret_found === 1}
                          role={this.props.role}
                          werewolf_names={this.props.werewolf_names ?? []}
                          voted_name={this.props.voted_name}
                          other_players={this.props.other_players}/>
-      }
       case "waiting":
         return <WaitView/>
       default:
