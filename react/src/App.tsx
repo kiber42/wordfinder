@@ -4,11 +4,20 @@ import { Connection } from './Context'
 
 import { Countdown } from './Countdown'
 import { GameView } from './GameView'
+import { Header } from './Header'
+import { LobbyView } from './Lobby'
 import { Login } from './Login'
+import { ResultView } from './Results'
+import { WaitView } from './WaitView'
 
 interface IProps {
   token?: number;
   room_name?: string;
+}
+
+interface ISettings {
+  difficulty: number;
+  num_werewolves: number;
 }
 
 interface IState {
@@ -18,7 +27,7 @@ interface IState {
   token?: number;
   nickname: string;
   room_name: string;
-  game_state: string;
+  game_state: "lobby" | "choosing" | "main" | "vote" | "waiting";
   players: [number, string][];
   players_waiting?: [number, string][];
   player_role: string;
@@ -38,7 +47,7 @@ interface IState {
   invite_link: string;
 }
 
-export class App extends Component<IProps, IState> {
+export class App extends Component<IProps & ISettings, IState> {
   private refresh_timer?: number;
   private timeout_timer?: number;
 
@@ -51,7 +60,7 @@ export class App extends Component<IProps, IState> {
       token: this.props.token,
       nickname: "",
       room_name: "",
-      game_state: "",
+      game_state: "lobby",
       players: [],
       player_role: "",
       is_mayor: false,
@@ -61,10 +70,48 @@ export class App extends Component<IProps, IState> {
     }
   }
 
-  enterRoom(room_name, player_token)
-  {
+  private enterRoom(room_name: string, player_token: number) {
     this.setState({token: player_token});
     window.history.pushState({"token": player_token}, "Werewords " + room_name, "?token=" + player_token);
+  }
+
+  private getMainContent() {
+    switch (this.state.game_state) {
+      case "lobby":
+        return (
+          <>
+            <ResultView secret_found={this.state.secret_found}
+                        role_found={this.state.role_found} 
+                        werewolf_names={this.state.werewolf_names ?? []}
+                        seer_name={this.state.seer_name ?? ""}
+                        received_votes={this.state.received_votes} />
+            <LobbyView num_players={this.state.players.length + 1}
+                       difficulty={this.state.difficulty}
+                       num_werewolves={this.state.num_werewolves}
+                       invite_link={this.state.invite_link} />
+          </>
+        );
+        case "waiting":
+          return <WaitView/>
+        case "choosing":
+        case "main":
+        case "vote":
+          // TODO: Verify that inputs are complete
+          return (
+            <GameView state={this.state.game_state}
+                      role={this.state.player_role}
+                      is_mayor={this.state.is_mayor}
+                      mayor={this.state.mayor ?? ""}
+                      words={this.state.words ?? []}
+                      secret_found={this.state.secret_found}
+                      werewolf_names={this.state.werewolf_names}
+                      other_werewolves={this.state.other_werewolves}
+                      seer_name={this.state.seer_name}
+                      voted_name={this.state.voted_name}
+                      received_votes={this.state.received_votes}
+                      other_players={this.state.players}/>
+          );
+    }
   }
 
   render() {
@@ -74,35 +121,12 @@ export class App extends Component<IProps, IState> {
     if (this.state.is_valid) {
       const active_players = this.state.players.map((player) => player[1]);
       const waiting_players = this.state.players_waiting ? this.state.players_waiting.map((player) => player[1]) : [];
-      let items = <>
-          <Welcome name={this.state.nickname} room={this.state.room_name}/>
-          <Teammates active={active_players} waiting={waiting_players}/>
-          <GameView state={this.state.game_state}
-                    role={this.state.player_role}
-                    is_mayor={this.state.is_mayor}
-                    mayor={this.state.mayor}
-                    difficulty={this.state.difficulty}
-                    num_werewolves={this.state.num_werewolves}
-                    words={this.state.words}
-                    secret_found={this.state.secret_found}
-                    role_found={this.state.role_found}
-                    werewolf_names={this.state.werewolf_names}
-                    other_werewolves={this.state.other_werewolves}
-                    seer_name={this.state.seer_name}
-                    voted_name={this.state.voted_name}
-                    received_votes={this.state.received_votes}
-                    other_players={this.state.players}
-                    num_players={this.state.players.length + 1}
-                    invite_link={this.state.invite_link}/>
-          <Countdown seconds_initial={this.state.seconds_left}/>
-
-      </>
-      if (!this.state.connected)
-        items = <>{items}<div>No connection to server!</div></>
-
       return (
         <Connection.Provider value={{token: this.state.token}}>
-          {items}
+          <Header name={this.state.nickname} room={this.state.room_name} active={active_players} waiting={waiting_players}/>
+          {this.getMainContent()}
+          <Countdown seconds_initial={this.state.seconds_left}/>
+          {this.state.connected || <div>No connection to server!</div>}
         </Connection.Provider>
       );
     }
@@ -110,7 +134,7 @@ export class App extends Component<IProps, IState> {
     if (this.state.error)
       return <div>Server meldet Fehler: {this.state.error}</div>
 
-    return <div>Waiting for server response...</div>
+    return <div>Warte auf Server...</div>
   }
 
   componentDidMount() {
@@ -122,8 +146,7 @@ export class App extends Component<IProps, IState> {
   }
 
   refresh() {
-    if (!this.state.token)
-    {
+    if (!this.state.token) {
       // User did not join a room yet, do not request state
       this.refresh_timer = setTimeout((this.refresh.bind(this)) as TimerHandler, 200);
       return;
@@ -183,48 +206,5 @@ export class App extends Component<IProps, IState> {
         }
       })
     .catch(err => console.error(err));
-  }
-}
-
-interface IWelcomeProps {
-  name: string;
-  room: string;
-}
-
-class Welcome extends Component<IWelcomeProps> {
-  render() {
-    return (
-      <div>
-        <div>Hallo, {this.props.name}!</div>
-        <div>Du spielst in Raum {this.props.room}.</div>
-      </div>
-    );
-  }
-}
-
-interface ITeamProps {
-  active: string[];
-  waiting?: string[];
-}
-
-class Teammates extends Component<ITeamProps> {
-  render() {
-    const names = this.props.active.join(", ");
-    if (this.props.waiting === undefined)
-    { // in lobby / waiting for game to finish
-      if (this.props.active.length === 0)
-        return <div>Du bist alleine im Raum.</div>
-      return <div>Mit dir im Raum: {names}</div>;
-    }
-    const waiting = this.props.waiting.join(", ");
-    if (this.props.active.length === 0)
-    { 
-      if (this.props.waiting.length === 0)
-        return <div>Du bist alleine im Raum.</div>;
-      return <div>Du bist alleine im Spiel, aber es wartet jemand in der Lobby: {waiting}</div>;
-    }
-    if (this.props.waiting.length === 0)
-      return <div>Mit dir im Spiel: {names}</div>;
-    return <div><div>Mit dir im Spiel: {names}</div><div>In der Lobby: {waiting}</div></div>;
   }
 }
