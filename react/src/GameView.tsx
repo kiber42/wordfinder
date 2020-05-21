@@ -72,12 +72,15 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
                                  invite_link={this.props.invite_link}/>;
         if (this.props.secret_found !== undefined)
         {
-          // Secret found and seer found => Werewolf wins
-          // Secret not found and wolf not found => Werewolf wins
-          const winner = (this.props.secret_found + (this.props.role_found ?? 0)) === 1 ? "villagers" : "werewolf";
           return (
             <>
-              <ResultView winner={winner} werewolf_names={this.props.werewolf_names ?? []} seer_name={this.props.seer_name ?? ""} received_votes={this.props.received_votes}/>
+              <ResultView
+                secret_found={!!this.props.secret_found}
+                role_found={!!this.props.role_found} 
+                werewolf_names={this.props.werewolf_names ?? []}
+                seer_name={this.props.seer_name ?? ""}
+                received_votes={this.props.received_votes}
+                />
               {lobby}
             </>
           );
