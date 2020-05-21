@@ -4,7 +4,7 @@ import { GuessingView } from './GuessingView'
 import { LobbyView } from './Lobby'
 import { MayorView } from './MayorView'
 import { ResultView } from './Results'
-import { SecretRole, SecretRoleCard } from './SecretRole'
+import { SecretRoleCard } from './SecretRole'
 import { VoteView } from './Voting'
 import { WaitView } from './WaitView'
 
@@ -36,7 +36,8 @@ interface ISettings {
 
 export class GameView extends React.Component<IGameProps & IPlayerProps & ISettings> {
   // TODO: Implement componentDidUpdate that checks that required props are defined
-  //       (here or in a component further down the hierarchy)
+  //       (here or in a component further down the hierarchy).
+  //       Also make sure that others are not set (e.g. secret word, other werewolves, or time left if these are not supposed to be available)
 
   render() {
     if (this.props.role !== undefined)
@@ -74,21 +75,12 @@ export class GameView extends React.Component<IGameProps & IPlayerProps & ISetti
         return lobby;
       }
       case "choosing":
-        if (this.props.is_mayor)
-        {
-          if (!this.props.words)
-            console.warn("Have no words to choose from!");
-          return <MayorView words={this.props.words ?? []} role={this.props.role} other_werewolves={this.props.other_werewolves}/>
-        }
-        return (
-          <div>
-            <div>Bürgermeister <b>{this.props.mayor}</b> wählt das Zauberwort aus.</div>
-            <SecretRole role={this.props.role} other_werewolves={this.props.other_werewolves}/>
-          </div>
-        );
+        return this.props.is_mayor ?
+          <MayorView role={this.props.role} words={this.props.words} other_werewolves={this.props.other_werewolves}/> :
+          <div className="player-info">Bürgermeister <b>{this.props.mayor}</b> wählt das Zauberwort aus.</div>
       case "main":
         return this.props.is_mayor ?
-          <MayorView role={this.props.role} secret={secret}/> :
+          <MayorView role={this.props.role} words={this.props.words} secret={secret} other_werewolves={this.props.other_werewolves}/> :
           <GuessingView role={this.props.role} secret={secret} other_werewolves={this.props.other_werewolves}/>;
       case "vote": {
         return <VoteView secret={secret}
