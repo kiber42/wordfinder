@@ -19,7 +19,7 @@ export class VoteView extends Component<IVoteViewProps & IVoteProps> {
   render() {
     const isWerewolf = this.props.role === "werewolf";
     const hasVote = !this.props.secret_found || isWerewolf;
-    const votePrompt : string = isWerewolf ?
+    const votePrompt : string = this.props.secret_found ?
       "Finde die Seherin, um die Partie zu gewinnen!" :
       "Stimmt jetzt darüber ab, wen ihr für den Werwolf haltet!";
     return (
