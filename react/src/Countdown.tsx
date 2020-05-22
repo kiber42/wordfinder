@@ -20,15 +20,15 @@ export class Countdown extends React.Component<IProps, IState> {
     };
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     this.timer = setInterval((() => this.refresh()) as TimerHandler, 200);
   }
 
-  componentWillUnmount() {
+  public componentWillUnmount() {
     clearInterval(this.timer);
   }
 
-  componentDidUpdate(prevprops: IProps) {
+  public componentDidUpdate(prevprops: IProps) {
     if (this.props.seconds_initial !== prevprops.seconds_initial) {
       if (this.props.seconds_initial === undefined) {
         this.setState({seconds_left: undefined});
@@ -45,15 +45,20 @@ export class Countdown extends React.Component<IProps, IState> {
     }
   }
 
-  render() {
+  public render() {
     if (this.state.seconds_left === undefined)
       return null;
     const minutes = Math.floor(this.state.seconds_left / 60);
     const seconds = this.state.seconds_left % 60;
-    return <div>Verbleibende Zeit: {minutes}:{seconds.toString().padStart(2, '0')}</div>
+    return (
+      <div className="countdown">
+        <div className="countdown-label">Verbleibende Zeit:</div>
+        <div className="countdown-value">{minutes}:{seconds.toString().padStart(2, '0')}</div>
+      </div>
+    );
   }
 
-  refresh() {
+  private refresh() {
     if (this.state.seconds_left === undefined)
       return;
     const value = Math.floor((this.state.end_time - Date.now()) / 1000);
