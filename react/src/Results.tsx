@@ -2,12 +2,11 @@ import React, { Component } from 'react'
 
 import { NameGroup } from './NameGroup'
 
-interface IResultViewProps {
+interface IResultViewProps extends IVoteResultProps {
   secret_found?: number;
   role_found?: number;
   werewolf_names: string[];
   seer_name: string;
-  received_votes?: { [votee: string] : string[] };
 }
 
 export class ResultView extends Component<IResultViewProps> {
@@ -31,7 +30,7 @@ export class ResultView extends Component<IResultViewProps> {
     return (
       <div>
         <div>Die Runde ist zu Ende:</div>
-        {this.props.received_votes && <VoteResults received_votes={this.props.received_votes}/>}
+        <VoteResults received_votes={this.props.received_votes}/>
         <div><b>{this.props.seer_name}</b> war die Seherin.</div>
         {this.getWinnerMessage()}
       </div>
@@ -39,16 +38,23 @@ export class ResultView extends Component<IResultViewProps> {
   }
 }
 
-interface IVoteResults {
-  received_votes: { [votee: string] : string[] };
+interface IVoteResultProps {
+  received_votes?: { [votee: string] : string[] };
 }
 
-class VoteResults extends Component<IVoteResults> {
+class VoteResults extends Component<IVoteResultProps> {
   render() {
-    const list = Object.keys(this.props.received_votes).map((vote_recipient, index) => {
-      const voters = this.props.received_votes[vote_recipient];
-      return <li key={index}><NameGroup items={voters} singular="stimmte" plural="stimmten"/> für <b>{vote_recipient}</b></li>
+    if (!this.props.received_votes)
+      return null;
+    const votes = this.props.received_votes;
+    const list = Object.keys(votes).map((vote_recipient, index) => {
+      const voters = votes[vote_recipient];
+      return (
+        <li key={index} className="vote-result">
+          <NameGroup items={voters} singular="stimmte" plural="stimmten"/> für <b>{vote_recipient}</b>
+        </li>
+      );
     });
-    return <ul>{list}</ul>
+    return <ul className="vote-results-container">{list}</ul>
   }
 }
