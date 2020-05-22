@@ -127,7 +127,7 @@ if ($game_state != "lobby")
     $timeout = $game_state == "main" ? 4 * 60 : 60;
     $seconds_left = $timeout - (int)$seconds;
     $response["seconds_left"] = $seconds_left;
-    if ($seconds_left <= 0)
+    if ($seconds_left <= -3)
     {
         switch ($game_state) {
         case "choosing": $sql->query("CALL choose_word($token, -1)"); break;
