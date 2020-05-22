@@ -31,6 +31,7 @@ interface IState {
   difficulty: number;
   num_werewolves: number;
   words?: string[];
+  secret?: string;
   secret_found?: number;
   role_found?: number;
   werewolf_names?: string[];
@@ -102,8 +103,8 @@ export class App extends Component<IProps, IState & ISettings> {
                       role={this.state.player_role}
                       is_mayor={this.state.is_mayor}
                       mayor={this.state.mayor ?? ""}
-                      words={this.state.words && this.state.words.length > 0 ? this.state.words : undefined}
-                      secret={this.state.words && this.state.words.length === 1 ? this.state.words[0] : undefined}
+                      words={this.state.words}
+                      secret={this.state.secret}
                       secret_found={this.state.secret_found}
                       werewolf_names={this.state.werewolf_names}
                       other_werewolves={this.state.other_werewolves}
@@ -179,6 +180,7 @@ export class App extends Component<IProps, IState & ISettings> {
             difficulty: result.difficulty,
             num_werewolves: result.num_werewolves,
             words: result.words,
+            secret: result.secret,
             secret_found: result.secret_found,
             role_found: result.role_found,
             werewolf_names: result.werewolf_names,

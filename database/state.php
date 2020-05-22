@@ -74,7 +74,7 @@ if ($game_state == "choosing")
 else if (($game_state == "main" and ($is_mayor or $role != "villager")) or $game_state == "vote")
 {
     $result = $sql->query("SELECT word FROM Words INNER JOIN Rooms WHERE word_id = secret AND room_id = ${room_id} LIMIT 1");
-    $response["words"] = [$result->fetch_row()[0]];
+    $response["secret"] = $result->fetch_row()[0];
     $result->close();
 }
 
