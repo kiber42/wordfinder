@@ -23,6 +23,7 @@ export class TestGameView extends React.Component<ISettings, ISettings> {
     let role = this.state.role;
     let is_mayor = this.state.is_mayor;
     let words : string[] | undefined;
+    let secret : string | undefined;
     switch (this.state.state) {
       case "choosing":
         if (this.state.is_mayor)
@@ -30,10 +31,10 @@ export class TestGameView extends React.Component<ISettings, ISettings> {
         break;
       case "main":
         if (this.state.is_mayor || role !== "villager")
-          words = ["geheim"];
+          secret = "geheim";
         break;
       case "vote":
-        words = ["geheim"];
+        secret = "geheim";
     }
 
     let other_werewolves : string[] | undefined;
@@ -48,6 +49,7 @@ export class TestGameView extends React.Component<ISettings, ISettings> {
       role={role}
       other_werewolves={other_werewolves}
       words={words}
+      secret={secret}
       secret_found={1}
       werewolf_names={["Trick", "Track"]}
       />
