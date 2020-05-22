@@ -45,28 +45,6 @@ export class SecretRoleCard extends Component<ISecretRoleCardProps> {
   }
 }
 
-export interface ISecretRoleProps extends IOtherWerewolvesProps {
-  role: Role;
-}
-
-export class SecretRole extends Component<ISecretRoleProps> {
-  render() {
-    const message = "Deine geheime Rolle:";
-    switch (this.props.role)
-    {
-      case "werewolf":
-        return (
-          <>
-            <div>{message} <b>Werwolf</b>!</div>
-            <OtherWerewolves other_werewolves={this.props.other_werewolves}/>
-          </>
-        );
-      case "seer": return <div>{message} <b>Seherin</b></div>
-      case "villager": return <div>{message} <b>Dorfbewohner</b></div>
-    }
-  }
-}
-
 export interface IOtherWerewolvesProps {
   other_werewolves?: string[];
 }
