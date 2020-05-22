@@ -9,6 +9,7 @@ interface IGameProps {
   state: "choosing" | "main" | "vote";
   other_players: [number, string][];
   words?: string[];
+  secret?: string;
   secret_found?: number;
   mayor: string;
   werewolf_names?: string[];
@@ -35,7 +36,6 @@ export class GameView extends React.Component<IGameProps & IPlayerProps> {
   }
 
   private getMainContent() {
-    const secret = this.props.words !== undefined && this.props.words.length > 0 ? this.props.words[0] : "";
     switch (this.props.state)
     {
       case "choosing":
@@ -44,10 +44,10 @@ export class GameView extends React.Component<IGameProps & IPlayerProps> {
           <GuessingView mayor={this.props.mayor} has_chosen={false} role={this.props.role} other_werewolves={this.props.other_werewolves}/>
       case "main":
         return this.props.is_mayor ?
-          <MayorView role={this.props.role} secret={secret} other_werewolves={this.props.other_werewolves}/> :
-          <GuessingView mayor={this.props.mayor} has_chosen={true} role={this.props.role} secret={secret} other_werewolves={this.props.other_werewolves}/>
+          <MayorView role={this.props.role} secret={this.props.secret} other_werewolves={this.props.other_werewolves}/> :
+          <GuessingView mayor={this.props.mayor} has_chosen={true} role={this.props.role} secret={this.props.secret} other_werewolves={this.props.other_werewolves}/>
       case "vote":
-        return <VoteView secret={secret}
+        return <VoteView secret={this.props.secret ?? ""}
                          secret_found={this.props.secret_found === 1}
                          role={this.props.role}
                          werewolf_names={this.props.werewolf_names ?? []}

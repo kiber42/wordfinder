@@ -102,7 +102,8 @@ export class App extends Component<IProps, IState & ISettings> {
                       role={this.state.player_role}
                       is_mayor={this.state.is_mayor}
                       mayor={this.state.mayor ?? ""}
-                      words={this.state.words ?? []}
+                      words={this.state.words && this.state.words.length > 0 ? this.state.words : undefined}
+                      secret={this.state.words && this.state.words.length === 1 ? this.state.words[0] : undefined}
                       secret_found={this.state.secret_found}
                       werewolf_names={this.state.werewolf_names}
                       other_werewolves={this.state.other_werewolves}
