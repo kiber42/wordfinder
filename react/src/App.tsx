@@ -2,13 +2,14 @@ import React, { Component } from 'react'
 
 import { Connection } from './Context'
 
+import { Banner } from './Banner'
 import { Countdown } from './Countdown'
 import { GameView } from './GameView'
-import { Header } from './Header'
 import { LobbyView } from './Lobby'
 import { Login } from './Login'
 import { ResultView } from './Results'
 import { Role } from './SecretRole' // eslint-disable-line no-unused-vars
+import { Team } from './Team'
 import { WaitView } from './WaitView'
 
 interface IProps {
@@ -78,6 +79,8 @@ export class App extends Component<IProps, IState & ISettings> {
   }
 
   private getMainContent() {
+    const active_players = this.state.players.map((player) => player[1]);
+    const waiting_players = this.state.players_waiting ? this.state.players_waiting.map((player) => player[1]) : [];
     switch (this.state.game_state) {
       case "lobby":
         return (
@@ -87,19 +90,21 @@ export class App extends Component<IProps, IState & ISettings> {
                         werewolf_names={this.state.werewolf_names ?? []}
                         seer_name={this.state.seer_name ?? ""}
                         received_votes={this.state.received_votes} />
+            <Banner name={this.state.nickname} room={this.state.room_name}/>
+            <Team active={active_players} waiting={waiting_players}/>
             <LobbyView num_players={this.state.players.length + 1}
                        difficulty={this.state.difficulty}
                        num_werewolves={this.state.num_werewolves}
                        invite_link={this.state.invite_link} />
           </>
         );
-        case "waiting":
-          return <WaitView/>
-        case "choosing":
-        case "main":
-        case "vote":
-          // TODO: Verify that inputs are complete
-          return (
+      case "waiting":
+        return <WaitView/>
+      case "choosing":
+      case "main":
+      case "vote":
+        return (
+          <>
             <GameView state={this.state.game_state}
                       role={this.state.player_role}
                       is_mayor={this.state.is_mayor}
@@ -111,7 +116,11 @@ export class App extends Component<IProps, IState & ISettings> {
                       other_werewolves={this.state.other_werewolves}
                       voted_name={this.state.voted_name}
                       other_players={this.state.players}/>
-          );
+            <Countdown seconds_initial={this.state.seconds_left}/>
+            <Team active={active_players} waiting={waiting_players}/>
+            <Banner name={this.state.nickname} room={this.state.room_name}/>
+          </>
+        );
     }
   }
 
@@ -120,14 +129,10 @@ export class App extends Component<IProps, IState & ISettings> {
       return <Login room_name={this.props.room_name} tokenAvailable={this.enterRoom.bind(this)}/>
 
     if (this.state.is_valid) {
-      const active_players = this.state.players.map((player) => player[1]);
-      const waiting_players = this.state.players_waiting ? this.state.players_waiting.map((player) => player[1]) : [];
       return (
         <Connection.Provider value={{token: this.state.token}}>
-          <Header name={this.state.nickname} room={this.state.room_name} active={active_players} waiting={waiting_players}/>
+          {this.state.connected || <div className="connection-error">No connection to server!</div>}
           {this.getMainContent()}
-          <Countdown seconds_initial={this.state.seconds_left}/>
-          {this.state.connected || <div>No connection to server!</div>}
         </Connection.Provider>
       );
     }
@@ -169,6 +174,8 @@ export class App extends Component<IProps, IState & ISettings> {
           // Not all of the possible items will be sent by state.php in each
           // state of the game.  It is important to set missing items to
           // undefined, to avoid presenting outdated values.
+          // TODO: Verify that inputs are valid and complete
+          // TODO: Pull backend connection logic into separate class?
           this.setState({
             nickname: result.nickname,
             room_name: result.room_name,
