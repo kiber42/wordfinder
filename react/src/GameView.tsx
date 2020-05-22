@@ -23,10 +23,6 @@ interface IPlayerProps {
 }
 
 export class GameView extends React.Component<IGameProps & IPlayerProps> {
-  // TODO: Implement componentDidUpdate that checks that required props are defined
-  //       (here or in a component further down the hierarchy).
-  //       Also make sure that others are not set (e.g. secret word, other werewolves, or time left if these are not supposed to be available)
-
   private getMayorAndRoleTag() {
     if (!this.props.is_mayor)
       return this.props.role;
@@ -56,12 +52,45 @@ export class GameView extends React.Component<IGameProps & IPlayerProps> {
     }
   }
 
-  render() {
+  public render() {
     return (
       <div className={"player-container " + this.getMayorAndRoleTag()}>
         <SecretRoleCard role={this.props.role} is_mayor={this.props.is_mayor}/>
         {this.getMainContent()}
       </div>
     );
+  }
+
+  public componentDidUpdate() {
+    // Verify that optional input is as expected
+    switch (this.props.state) {
+      case "choosing":
+        if (this.props.is_mayor && (this.props.words === undefined || this.props.words.length < 3))
+          console.error("Missing input: Not enough words");
+        if (this.props.role === "werewolf" && !this.props.other_werewolves)
+          console.error("Missing input: Other werewolves");
+        break;
+      case "main":
+        if (this.props.role !== "villager" && !this.props.secret)
+          console.error("Missing input: Secret word");
+        if (this.props.role === "werewolf" && !this.props.other_werewolves)
+          console.error("Missing input: Other werewolves");
+        break;
+      case "vote":
+        if (!this.props.secret)
+          console.error("Missing input: Secret word");
+        if (this.props.secret_found === undefined)
+          console.error("Missing input: Secret found status");
+        if (this.props.other_players.length < 2)
+          console.error("Missing input: Player names")
+        if (this.props.secret_found === 0 &&
+            (this.props.werewolf_names === undefined || this.props.werewolf_names.length === 0))
+          console.error("Missing input: Werewolf names");
+        break;
+      default:
+        console.error("Invalid state: " + this.props.state);
+    }
+
+
   }
 }
