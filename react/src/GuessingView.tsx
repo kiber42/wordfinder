@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { OtherWerewolves, IOtherWerewolvesProps } from './SecretRole' // eslint-disable-line no-unused-vars
+import { OtherWerewolves, IOtherWerewolvesProps, Role } from './SecretRole' // eslint-disable-line no-unused-vars
 
 interface IProps {
   mayor: string;
   has_chosen: boolean;
-  role: string;
+  role: Role;
   secret?: string;
 }
 
@@ -14,12 +14,13 @@ export class GuessingView extends React.Component<IProps & IOtherWerewolvesProps
     if (!this.props.has_chosen)
       return <div className="instructions wait">Bürgermeister <b>{this.props.mayor}</b> wählt das Zauberwort aus.</div>
 
-    const instructions = {
-      "werewolf": "Verhindere, dass die anderen es erraten — aber ohne erkannt zu werden!",
-      "seer": "Hilf den anderen es zu erraten — aber ohne erkannt zu werden!",
-      "villager": "Erratet das Zauberwort, ehe die Zeit abläuft!"
-    };
-    return <div className="instructions">{instructions[this.props.role]}</div>
+    let instructions : string;
+    switch (this.props.role) {
+      case "werewolf": instructions = "Verhindere, dass die anderen es erraten — aber ohne erkannt zu werden!"; break;
+      case "seer": instructions = "Hilf den anderen es zu erraten — aber ohne erkannt zu werden!"; break;
+      case "villager": instructions = "Erratet das Zauberwort, ehe die Zeit abläuft!"; break;
+    }
+    return <div className="instructions">{instructions}</div>
   }
 
   render() {

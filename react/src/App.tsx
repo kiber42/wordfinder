@@ -8,6 +8,7 @@ import { Header } from './Header'
 import { LobbyView } from './Lobby'
 import { Login } from './Login'
 import { ResultView } from './Results'
+import { Role } from './SecretRole' // eslint-disable-line no-unused-vars
 import { WaitView } from './WaitView'
 
 interface IProps {
@@ -25,7 +26,7 @@ interface IState {
   game_state: "lobby" | "choosing" | "main" | "vote" | "waiting";
   players: [number, string][];
   players_waiting?: [number, string][];
-  player_role: string;
+  player_role: Role;
   is_mayor: boolean;
   mayor?: string;
   difficulty: number;
@@ -63,7 +64,7 @@ export class App extends Component<IProps, IState & ISettings> {
       room_name: "",
       game_state: "lobby",
       players: [],
-      player_role: "",
+      player_role: "villager",
       is_mayor: false,
       difficulty: 1,
       num_werewolves: 1,

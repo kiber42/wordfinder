@@ -2,9 +2,10 @@ import React, { Component } from 'react'
 
 import { Connection } from './Context'
 import { NameGroup } from './NameGroup'
+import { Role } from './SecretRole' // eslint-disable-line no-unused-vars
 
 interface IVoteViewProps {
-  role: string;
+  role: Role;
   secret_found: boolean;
   secret: string;
   werewolf_names: string[];

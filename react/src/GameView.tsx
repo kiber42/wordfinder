@@ -2,7 +2,7 @@ import React from 'react'
 
 import { GuessingView } from './GuessingView'
 import { MayorView } from './MayorView'
-import { SecretRoleCard } from './SecretRole'
+import { Role, SecretRoleCard } from './SecretRole' // eslint-disable-line no-unused-vars
 import { VoteView } from './Voting'
 
 interface IGameProps {
@@ -17,7 +17,7 @@ interface IGameProps {
 
 interface IPlayerProps {
   is_mayor: boolean;
-  role: string;
+  role: Role;
   other_werewolves?: string[];
   voted_name?: string;
 }

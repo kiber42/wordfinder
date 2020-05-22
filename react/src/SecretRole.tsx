@@ -2,8 +2,10 @@ import React, { Component } from 'react'
 
 import { NameGroup } from './NameGroup'
 
+export type Role = "villager" | "werewolf" | "seer";
+
 export interface ISecretRoleCardProps {
-  role: string;
+  role: Role;
   is_mayor: boolean;
 }
 
@@ -14,7 +16,6 @@ export class SecretRoleCard extends Component<ISecretRoleCardProps> {
       case "werewolf": return this.props.is_mayor ? "Bürgermeister-Werwolf" : "Werwolf";
       case "seer": return this.props.is_mayor ? "Bürgermeister-Seherin" : "Seherin";
       case "villager": return this.props.is_mayor ? "Bürgermeister" : "Dorfbewohner";
-      default: return null;
     }
   }
 
@@ -45,7 +46,7 @@ export class SecretRoleCard extends Component<ISecretRoleCardProps> {
 }
 
 export interface ISecretRoleProps extends IOtherWerewolvesProps {
-  role: string;
+  role: Role;
 }
 
 export class SecretRole extends Component<ISecretRoleProps> {
@@ -62,7 +63,6 @@ export class SecretRole extends Component<ISecretRoleProps> {
         );
       case "seer": return <div>{message} <b>Seherin</b></div>
       case "villager": return <div>{message} <b>Dorfbewohner</b></div>
-      default: return null;
     }
   }
 }

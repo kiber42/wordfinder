@@ -1,10 +1,10 @@
 import React from 'react';
 
 import { Connection } from './Context'
-import { OtherWerewolves, IOtherWerewolvesProps } from './SecretRole' // eslint-disable-line no-unused-vars
+import { OtherWerewolves, IOtherWerewolvesProps, Role } from './SecretRole' // eslint-disable-line no-unused-vars
 
 interface IProps {
-  role: string;
+  role: Role;
   secret?: string;
   words?: string[];
 }
@@ -13,21 +13,21 @@ export class MayorView extends React.Component<IProps & IOtherWerewolvesProps> {
   static contextType = Connection;
 
   private getInstructions() {
-
-    const instructions = {
-      "werewolf": "Mache es den Ratern möglichst schwer, ohne dass sie dir auf die Schliche kommen!",
-      "seer": "Mache es den Ratern möglichst einfach, ohne dass der Werwolf dich erkennt!",
-      "villager": "Viel Erfolg!"
-    };
+    let instructions : string;
+    switch (this.props.role) {
+      case "werewolf": instructions = "Mache es den Ratern möglichst schwer, ohne dass sie dir auf die Schliche kommen!"; break;
+      case "seer": instructions = "Mache es den Ratern möglichst einfach, ohne dass der Werwolf dich erkennt!"; break;
+      case "villager": instructions = "Viel Erfolg!"; break;
+    }
     return (
       <div className="instructions">
         <div>Die anderen müssen das Wort erraten, aber du darfst nur mit Ja, Nein, und Vielleicht antworten.</div>
-        <div>{instructions[this.props.role]}</div>
+        <div>{instructions}</div>
       </div>
     );
   }
 
-  render() {
+  public render() {
     if (this.props.words) {
       const words = this.props.words.map((word, index) => <button onClick={() => this.choose_word(index)} key={index}>{word}</button>);
       return (
