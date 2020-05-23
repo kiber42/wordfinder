@@ -27,9 +27,9 @@ export class ResultView extends Component<IResultViewProps> {
       <div className="results-container">
         <div className="results-title">Runde zu Ende</div>
         <div className="results">
+          {!werewolf_won && <div>Die Dorfbewohner haben gewonnen!</div>}
           {werewolf}
           {seer}
-          {!werewolf_won && <div>Die Dorfbewohner haben gewonnen!</div>}
         </div>
         <VoteResults received_votes={this.props.received_votes ?? {}}/>
       </div>
