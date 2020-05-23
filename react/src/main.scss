@@ -1,4 +1,4 @@
-$padding: 0.5rem;
+$spacing: 0.5rem;
 
 html {
   min-height: 100%;
@@ -19,7 +19,7 @@ body {
   font-weight: bold;
   text-shadow: 0 0 0.2rem blueviolet;
   .playername, .roomname {
-    margin: $padding;
+    margin: $spacing;
   }
 }
 
@@ -30,7 +30,7 @@ body {
 
 .teamnames, .waitingnames {
   @include text1;
-  padding: $padding;
+  padding: $spacing;
 }
 
 .waitingnames {
@@ -40,14 +40,19 @@ body {
 .startbutton {
   display: flex;
   justify-content: center;
-  padding: 0 $padding $padding $padding;
+  padding: $spacing;
+  margin-bottom: $spacing;
 }
 
-.settings-container {
+@mixin container {
   background-color: #2b29264f;
   color: #f3e6ff;
   border: 1px solid #e0beff;
-  padding: $padding;
+  padding: $spacing;
+}
+
+.settings-container {
+  @include container;
   display: flex;
   justify-content: space-around;
 }
@@ -67,7 +72,7 @@ body {
     }
   }
   div:last-child {
-    margin: $padding;
+    margin: $spacing;
   }
 }
 
@@ -77,14 +82,14 @@ body {
 
 .invite-link-message {
   @include text1;
-  padding: $padding;
+  padding: $spacing;
 }
 
 .invite-link {
   display: flex;
   align-items: stretch;
-  padding-left: $padding;
-  padding-right: $padding;
+  padding-left: $spacing;
+  padding-right: $spacing;
   input {
     flex-grow: 1;
   }
@@ -182,4 +187,29 @@ body {
   .countdown-value {
     font-size: 200%;
   }
+}
+
+.results-container {
+  @include container;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-top: $spacing;
+}
+
+.results-title {
+	font-size: 150%;
+	margin-bottom: $spacing;
+}
+
+.results {
+  margin: $spacing;
+  div {
+    margin-bottom: 0.2rem;
+  }
+}
+
+ul.vote-results-container {
+  padding: 0 $spacing;
+  margin: $spacing;
 }
