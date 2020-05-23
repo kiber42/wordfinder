@@ -85,12 +85,12 @@ export class App extends Component<IProps, IState & ISettings> {
       case "lobby":
         return (
           <>
+            <Banner name={this.state.nickname} room={this.state.room_name}/>
             <ResultView secret_found={this.state.secret_found}
                         role_found={this.state.role_found} 
                         werewolf_names={this.state.werewolf_names ?? []}
                         seer_name={this.state.seer_name ?? ""}
                         received_votes={this.state.received_votes} />
-            <Banner name={this.state.nickname} room={this.state.room_name}/>
             <Team active={active_players} waiting={waiting_players}/>
             <LobbyView num_players={this.state.players.length + 1}
                        difficulty={this.state.difficulty}
