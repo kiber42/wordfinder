@@ -256,3 +256,15 @@ ul.vote-results-container {
   padding: 0 $spacing;
   margin: $spacing;
 }
+
+.waiting {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+
+  div {
+    @include text1;
+    font-size: 200%;
+    text-align: center;
+  }
+}
