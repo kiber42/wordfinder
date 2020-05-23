@@ -50,7 +50,7 @@ export class Login extends React.Component<IProps, IState> {
 
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>        
+      <form className="login" onSubmit={this.handleSubmit}>
       <table>
       <tbody>
         <tr>
@@ -66,9 +66,9 @@ export class Login extends React.Component<IProps, IState> {
             <td colSpan={2}>{this.state.message}</td>
           </tr>
         )}
-        <tr><td colSpan={2}><input type="submit" value="Go"/></td></tr>
       </tbody>
       </table>
+      <input type="submit" value="Start"/>
     </form>
     );
   }
