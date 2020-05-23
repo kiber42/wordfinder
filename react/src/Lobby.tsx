@@ -11,22 +11,26 @@ interface LobbyViewProps {
   num_werewolves: number;
 }
 
-class LobbyView extends Component<LobbyViewProps> {
+export class LobbyView extends Component<LobbyViewProps> {
   static contextType = Connection;
 
   render() {
     let startButton;
     if (this.props.num_players >= 3)
-      startButton = <div>Alle da? Dann <button onClick={() => this.startGame()}>Spiel starten!</button></div>
+      startButton = <button onClick={() => this.startGame()}>Spiel starten!</button>
     else
-      startButton = <div>In der Lobby, warte auf Mitspieler.</div>
+      startButton = <button disabled>Warte auf Mitspieler...</button>
     return (
-      <div>
-        <Difficulty current={this.props.difficulty}/>
-        <NumWerewolves current={this.props.num_werewolves} num_players={this.props.num_players}/>
-        {startButton}
+      <>
+        <div className="startbutton">
+          {startButton}
+        </div>
+        <div className="settings-container">
+          <Difficulty current={this.props.difficulty}/>
+          <NumWerewolves current={this.props.num_werewolves} num_players={this.props.num_players}/>
+        </div>
         <Invite link={this.props.invite_link}/>
-      </div>
+      </>
     );
   }
 
@@ -36,21 +40,19 @@ class LobbyView extends Component<LobbyViewProps> {
 }
 
 interface InviteProps {
-  link: string
+  link: string;
 }
 
 class Invite extends Component<InviteProps> {
   render() {
     return (
-      <div>
-        <div>Verwende diesen Link, um Mitspieler einzuladen:</div>
-        <div>
-          <input type="text" size={this.props.link.length} id="link" value={this.props.link} readOnly/>
-          <button onClick={() => copy(this.props.link)}>Link kopieren</button>
+      <div className="invite-link-container">
+        <div className="invite-link-message">Verwende diesen Link, um Mitspieler einzuladen:</div>
+        <div className="invite-link">
+          <input type="text" id="link" value={this.props.link} readOnly/>
+          <button onClick={() => copy(this.props.link)}>📋</button>
         </div>
       </div>
     );
   }
 }
-
-export { LobbyView };

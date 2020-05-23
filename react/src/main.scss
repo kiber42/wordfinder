@@ -1,3 +1,98 @@
+$padding: 0.5rem;
+
+html {
+  min-height: 100%;
+}
+
+body {
+	background: linear-gradient(135deg,#331f7b,#cbc5df);
+	margin: 0;
+	display: flex;
+	justify-content: center;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  background-color: black;
+  color: white;
+  font-weight: bold;
+  text-shadow: 0 0 0.2rem blueviolet;
+  .playername, .roomname {
+    margin: $padding;
+  }
+}
+
+@mixin text1 {
+  color: #ffcc6b;
+  text-shadow: 0 0 0.1rem black;
+}
+
+.teamnames, .waitingnames {
+  @include text1;
+  padding: $padding;
+}
+
+.waitingnames {
+  color: #ff6b6b;
+}
+
+.startbutton {
+  display: flex;
+  justify-content: center;
+  padding: 0 $padding $padding $padding;
+}
+
+.settings-container {
+  background-color: #2b29264f;
+  color: #f3e6ff;
+  border: 1px solid #e0beff;
+  padding: $padding;
+  display: flex;
+  justify-content: space-around;
+}
+
+.setting {
+  display: flex;
+  flex-direction: column;
+  :first-child {
+    font-weight: bold;
+  }
+  label {
+    color: #e0beff;
+    input {
+      position: relative;
+      top: 0.2rem;
+      margin-right: 0.5rem;
+    }
+  }
+  div:last-child {
+    margin: $padding;
+  }
+}
+
+.setting.numwerewolves {
+  align-items: center;
+}
+
+.invite-link-message {
+  @include text1;
+  padding: $padding;
+}
+
+.invite-link {
+  display: flex;
+  align-items: stretch;
+  padding-left: $padding;
+  padding-right: $padding;
+  input {
+    flex-grow: 1;
+  }
+  button {
+   font-family: symbola;
+  }
+}
+
 .player-container {
   display: flex;
   flex-flow: row nowrap;
@@ -72,4 +167,19 @@
 .secret {
   font-weight: bold;
   display: inline;
+}
+
+.connection-error {
+  background-color: red
+}
+
+.countdown {
+  display: flex;
+  align-items: center;
+
+  .countdown-label {
+  }
+  .countdown-value {
+    font-size: 200%;
+  }
 }
