@@ -17,7 +17,7 @@ $result->close();
 list($player_id, $nickname, $role, $vote, $room_id, $room_name, $game_state, $mayor_id, $difficulty, $num_werewolves, $secret_found, $role_found, $seconds) = $row;
 
 $protocol = isset($_SERVER["HTTPS"]) ? "https://" : "http://";
-$link = $protocol . $_SERVER["HTTP_HOST"] . dirname($_SERVER["PHP_SELF"]) . "/?room_name=$room_name";
+$link = $protocol . $_SERVER["HTTP_HOST"] . dirname($_SERVER["PHP_SELF"]) . "/?room=$room_name";
 $is_mayor = $player_id == $mayor_id;
 $response = ["nickname" => htmlspecialchars($nickname),
              "room_name" => htmlspecialchars($room_name),
