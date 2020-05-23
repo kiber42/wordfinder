@@ -47,7 +47,7 @@ class Invite extends Component<InviteProps> {
   render() {
     return (
       <div className="invite-link-container">
-        <div className="invite-link-message">Verwende diesen Link, um Mitspieler einzuladen:</div>
+        <div className="invite-link-message">Mit diesem Link kannst du weitere Spieler einladen:</div>
         <div className="invite-link">
           <input type="text" id="link" value={this.props.link} readOnly/>
           <button onClick={() => copy(this.props.link)}>📋</button>
