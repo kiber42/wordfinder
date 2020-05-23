@@ -105,6 +105,7 @@ export class App extends Component<IProps, IState & ISettings> {
       case "vote":
         return (
           <>
+            <Banner name={this.state.nickname} room={this.state.room_name}/>
             <GameView state={this.state.game_state}
                       role={this.state.player_role}
                       is_mayor={this.state.is_mayor}
@@ -118,7 +119,6 @@ export class App extends Component<IProps, IState & ISettings> {
                       other_players={this.state.players}/>
             <Countdown seconds_initial={this.state.seconds_left}/>
             <Team active={active_players} waiting={waiting_players}/>
-            <Banner name={this.state.nickname} room={this.state.room_name}/>
           </>
         );
     }
