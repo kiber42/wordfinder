@@ -50,10 +50,18 @@ export class Countdown extends React.Component<IProps, IState> {
       return null;
     const minutes = Math.floor(this.state.seconds_left / 60);
     const seconds = this.state.seconds_left % 60;
+    let color = {};
+    const threshold = 40;
+    if (this.state.seconds_left < threshold) {
+      const fadeIn = 255 * (1 - this.state.seconds_left / threshold);
+      color = { color: "rgb(" + fadeIn + "," + fadeIn / 3 + "," + fadeIn / 3 + ")"};
+    }
     return (
       <div className="countdown">
-        <div className="countdown-label">Verbleibende Zeit:</div>
-        <div className="countdown-value">{minutes}:{seconds.toString().padStart(2, '0')}</div>
+        <div>
+          <div className="countdown-label">Verbleibende Zeit:</div>
+          <div className="countdown-value" style={color}>{minutes}:{seconds.toString().padStart(2, '0')}</div>
+        </div>
       </div>
     );
   }
