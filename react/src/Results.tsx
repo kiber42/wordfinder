@@ -2,12 +2,11 @@ import React, { Component } from 'react'
 
 import { NameGroup } from './NameGroup'
 
-interface IResultViewProps {
+interface IResultViewProps extends IVoteResultProps {
   secret_found?: number;
   role_found?: number;
   werewolf_names: string[];
   seer_name: string;
-  received_votes?: { [votee: string] : string[] };
 }
 
 export class ResultView extends Component<IResultViewProps> {
@@ -31,7 +30,7 @@ export class ResultView extends Component<IResultViewProps> {
           {werewolf}
           {seer}
         </div>
-        <VoteResults received_votes={this.props.received_votes ?? {}}/>
+        <VoteResults received_votes={this.props.received_votes}/>
       </div>
     );
   }

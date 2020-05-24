@@ -37,7 +37,6 @@ interface IState {
   secret_found?: number;
   role_found?: number;
   werewolf_names?: string[];
-  other_werewolves?: string[];
   seer_name?: string;
   voted_name?: string;
   received_votes?: { [votee: string] : string[] };
@@ -90,7 +89,7 @@ export class App extends Component<IProps, IState & ISettings> {
                         role_found={this.state.role_found} 
                         werewolf_names={this.state.werewolf_names ?? []}
                         seer_name={this.state.seer_name ?? ""}
-                        received_votes={this.state.received_votes} />
+                        received_votes={this.state.received_votes ?? {}} />
             <Team active={active_players} waiting={waiting_players}/>
             <LobbyView num_players={this.state.players.length + 1}
                        difficulty={this.state.difficulty}
@@ -102,7 +101,9 @@ export class App extends Component<IProps, IState & ISettings> {
         return <WaitView/>
       case "choosing":
       case "main":
-      case "vote":
+      case "vote": {
+        const other_werewolves = this.state.werewolf_names ?
+          this.state.werewolf_names.filter(name => name !== this.state.nickname) : undefined;
         return (
           <>
             <Banner name={this.state.nickname} room={this.state.room_name}/>
@@ -114,13 +115,14 @@ export class App extends Component<IProps, IState & ISettings> {
                       secret={this.state.secret}
                       secret_found={this.state.secret_found}
                       werewolf_names={this.state.werewolf_names}
-                      other_werewolves={this.state.other_werewolves}
+                      other_werewolves={other_werewolves}
                       voted_name={this.state.voted_name}
                       other_players={this.state.players}/>
             <Countdown seconds_initial={this.state.seconds_left}/>
             <Team active={active_players} waiting={waiting_players}/>
           </>
         );
+      }
     }
   }
 
@@ -151,6 +153,28 @@ export class App extends Component<IProps, IState & ISettings> {
     clearTimeout(this.refresh_timer);
   }
 
+  componentDidUpdate() {
+    // Verify that optional input is as expected
+    // Several checks are deferred to individual components
+    if (this.state.game_state === "lobby" || this.state.game_state === "waiting")
+      return;
+    if (!this.state.players_waiting)
+      console.error("Missing input: Players waiting in lobby");
+    if (this.state.seconds_left === undefined)
+      console.error("Missing input: Countdown status");
+    if (this.state.game_state === "choosing") {
+      if (!this.state.is_mayor && !this.state.mayor)
+        console.error("Missing input: Mayor name");
+    } else if (this.state.game_state === "vote") {
+      if (!this.state.werewolf_names || this.state.werewolf_names.length === 0)
+        console.error("Missing input: Werewolf name(s)");
+      if (!this.state.seer_name)
+        console.error("Missing input: Seer name");
+      if (!this.state.received_votes)
+        console.error("Missing input: Voting results");
+    }
+  }
+
   refresh() {
     if (!this.state.token) {
       // User did not join a room yet, do not request state
@@ -169,12 +193,9 @@ export class App extends Component<IProps, IState & ISettings> {
       result => {
         if (!result.error)
         {
-          const other_werewolves = result.werewolf_names ?
-            result.werewolf_names.filter(name => name !== result.nickname) : undefined;
           // Not all of the possible items will be sent by state.php in each
           // state of the game.  It is important to set missing items to
           // undefined, to avoid presenting outdated values.
-          // TODO: Verify that inputs are valid and complete
           // TODO: Pull backend connection logic into separate class?
           this.setState({
             nickname: result.nickname,
@@ -192,7 +213,6 @@ export class App extends Component<IProps, IState & ISettings> {
             secret_found: result.secret_found,
             role_found: result.role_found,
             werewolf_names: result.werewolf_names,
-            other_werewolves: other_werewolves,
             seer_name: result.seer_names ? result.seer_names[0] : undefined,
             voted_name: result.voted_name,
             received_votes: result.received_votes_from,
