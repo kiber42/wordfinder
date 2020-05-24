@@ -83,7 +83,7 @@ export class GameView extends React.Component<IGameProps & IPlayerProps> {
           console.error("Missing input: Secret found status");
         if (this.props.other_players.length < 2)
           console.error("Missing input: Player names")
-        if (this.props.secret_found === 0 &&
+        if (this.props.secret_found === 1 &&
             (this.props.werewolf_names === undefined || this.props.werewolf_names.length === 0))
           console.error("Missing input: Werewolf names");
         break;
