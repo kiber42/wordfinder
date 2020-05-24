@@ -8,7 +8,6 @@ $spacing: 0.5rem;
 form.login {
   display: flex;
   flex-flow: row wrap;
-  align-items: stretch;
   justify-content: center;
   margin: 1rem;
 
@@ -33,6 +32,8 @@ form.login {
   > input {
     margin: 0.1rem 0;
     flex-grow: 1;
+    max-width: 20rem;
+    height: 4.4rem;
   }
 }
 
@@ -66,6 +67,7 @@ body {
 
 .waitingnames {
   color: #ff6b6b;
+  font-size: 150%;
 }
 
 .startbutton {
@@ -73,6 +75,9 @@ body {
   justify-content: center;
   padding: $spacing;
   margin-bottom: $spacing;
+  button {
+    padding: 1rem 2rem;
+  }
 }
 
 @mixin container {
@@ -133,6 +138,7 @@ body {
 .player-container {
   display: flex;
   flex-flow: row nowrap;
+  align-items: center;
   padding: 1rem;
 
   &.villager { background-color: #e6e4ae; }
@@ -193,10 +199,26 @@ body {
 }
 
 .player-info {
+  text-align: center;
   margin-left: 2 * $spacing;
-  div {
+  div:not(:last-child) {
     padding-bottom: $spacing;
   }
+}
+
+.wordlist, .namelist {
+  display: flex;
+  flex-direction: column;
+  button {
+    padding: 0.8rem 0.5rem;
+  }
+  button:not(:last-child) {
+    margin-bottom: $spacing;
+  }
+}
+
+button.word-found {
+  padding: 1rem 0.5rem;
 }
 
 .secret-message {
@@ -259,13 +281,14 @@ ul.vote-results-container {
 }
 
 .waiting {
+  width: 80vw;
   height: 100vh;
   display: flex;
   align-items: center;
 
   div {
     @include text1;
-    font-size: 200%;
+    font-size: 24pt;
     text-align: center;
   }
 }

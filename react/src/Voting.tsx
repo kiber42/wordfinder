@@ -30,11 +30,14 @@ export class VoteView extends Component<IVoteViewProps & IVoteProps> {
         <div className="secret-message">Ihr habt das Zauberwort <div className="secret">{this.props.secret}</div> nicht gefunden!</div>
       }
       {hasVote ?
-        <div>{votePrompt}<Vote other_players={this.props.other_players} voted_name={this.props.voted_name}/></div> :
-        (<>
+        <div>
+          <div>{votePrompt}</div>
+          <Vote other_players={this.props.other_players} voted_name={this.props.voted_name}/>
+        </div> :
+        <>
           <div><NameGroup items={this.props.werewolf_names} singular="ist der Werwolf!" plural="sind die Werwölfe!"/></div>
           <div>Werwolf, finde die Seherin!</div>
-        </>)
+        </>
       }
     </div>
     );
@@ -49,7 +52,7 @@ class Vote extends Component<IVoteProps> {
       return <div>Du hast für <b>{this.props.voted_name}</b> gestimmt. Warte auf andere Spieler.</div>
     const choices = this.props.other_players.map((player) =>
       <button onClick={() => this.choose(player[0])} key={player[0]}>{player[1]}</button>);
-    return <div>{choices}</div>
+    return <div className="namelist">{choices}</div>
   }
 
   choose(index) {

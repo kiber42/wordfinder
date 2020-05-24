@@ -21,7 +21,7 @@ export class MayorView extends React.Component<IProps & IOtherWerewolvesProps> {
     }
     return (
       <div className="instructions">
-        <div>Die anderen müssen das Wort erraten, aber du darfst nur mit Ja, Nein, und Vielleicht antworten.</div>
+        <div>Die anderen müssen das Wort erraten, aber du darfst nur mit <i>Ja</i>, <i>Nein</i> und <i>Vielleicht</i> antworten.</div>
         <div>{instructions}</div>
       </div>
     );
@@ -33,7 +33,7 @@ export class MayorView extends React.Component<IProps & IOtherWerewolvesProps> {
       return (
         <div className="player-info">
           <div className="instructions">Wähle dein Zauberwort:</div>
-          <div>{words}</div>
+          <div className="wordlist">{words}</div>
           <OtherWerewolves other_werewolves={this.props.other_werewolves}/>
         </div>
       );
@@ -45,7 +45,7 @@ export class MayorView extends React.Component<IProps & IOtherWerewolvesProps> {
           <div className="secret-message">Das Zauberwort ist: <div className="secret">{this.props.secret}</div></div>
           {this.getInstructions()}
           <OtherWerewolves other_werewolves={this.props.other_werewolves}/>
-          <button onClick={() => this.secret_found()}>Das Wort wurde erraten!</button>
+          <button className="word-found" onClick={() => this.secret_found()}>Das Wort wurde erraten!</button>
         </div>
       );
     }
