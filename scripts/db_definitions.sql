@@ -53,7 +53,7 @@ CREATE FUNCTION propose_name()
 RETURNS CHAR(10)
 BEGIN
   DECLARE name CHAR(10);
-  SELECT CONCAT(word, "-", FLOOR(RAND() * 900 + 100)) INTO name FROM Words WHERE difficulty = "easy" AND LENGTH(word) = 6 ORDER BY RAND() LIMIT 1;
+  SELECT CONCAT(word, "-", FLOOR(RAND() * 900 + 100)) INTO name FROM Words WHERE difficulty = "easy" AND CHAR_LENGTH(word) = 6 ORDER BY RAND() LIMIT 1;
   RETURN name;
 END//
 
