@@ -63,6 +63,9 @@ body {
 .teamnames, .waitingnames {
   @include text1;
   padding: $spacing;
+  word-wrap: break-word;
+  text-indent: -5.9rem;
+  padding-left: 5.9rem + $spacing;
 }
 
 .waitingnames {
