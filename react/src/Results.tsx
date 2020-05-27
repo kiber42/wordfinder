@@ -23,9 +23,9 @@ export class ResultView extends Component<IResultViewProps> {
     const seer = <div><b>{this.props.seer_name}</b> war die Seherin.</div>;
 
     return (
-      <div className="results-container">
+      <div className={"results-container " + (werewolf_won ? "werewolf-won" : "villagers-won")}>
         <div className="results-title">Runde zu Ende</div>
-        <div className="results">
+        <div className={"results " + (werewolf_won ? "werewolf-won" : "villagers-won")}>
           {!werewolf_won && <div>Die Dorfbewohner haben gewonnen!</div>}
           {werewolf}
           {seer}

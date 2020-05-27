@@ -264,6 +264,20 @@ button.word-found {
   align-items: center;
   flex-direction: column;
   margin-top: $spacing;
+
+  &.werewolf-won:before {
+    content: url('images/werewolf.svg');
+    display: block;
+    width: 20%;
+    margin-bottom: $spacing;
+  }
+
+  &.villagers-won:before {
+    content: url('images/seer.svg');
+    display: block;
+    width: 20%;
+    margin-bottom: $spacing;
+  }
 }
 
 .results-title {
