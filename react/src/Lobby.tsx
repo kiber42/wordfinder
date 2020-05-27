@@ -17,7 +17,7 @@ export class LobbyView extends Component<LobbyViewProps> {
   render() {
     let startButton;
     if (this.props.num_players >= 3)
-      startButton = <button onClick={() => this.startGame()}>Spiel starten!</button>
+      startButton = <button onClick={() => this.startGame()}>Alle da? Los geht&apos;s!</button>
     else
       startButton = <button disabled>Warte auf Mitspieler...</button>
     return (
