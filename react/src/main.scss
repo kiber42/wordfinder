@@ -5,17 +5,18 @@ $spacing: 0.5rem;
   text-shadow: 0 0 0.1rem black;
 }
 
-form.login {
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: center;
-  margin: 1rem;
+div.login {
+  form {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    margin: 1rem;
 
-  tr:nth-child(3) {
-    td {
-      color: red;
-      text-align: center;
-      padding: $spacing;
+    > input {
+      margin: 0.1rem 0;
+      flex-grow: 1;
+      max-width: 20rem;
+      height: 4.4rem;
     }
   }
 
@@ -29,11 +30,10 @@ form.login {
     }
   }
 
-  > input {
-    margin: 0.1rem 0;
-    flex-grow: 1;
-    max-width: 20rem;
-    height: 4.4rem;
+  div {
+    color: red;
+    text-align: center;
+    padding: $spacing;
   }
 }
 
