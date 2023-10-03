@@ -1,13 +1,13 @@
 {
-  "name": "react-typescript-starter",
-  "description": "Minimalist React 18 starter template with TypeScript ⚛",
-  "version": "1.0.0",
+  "name": "werewords",
+  "description": "Playing with React",
+  "version": "0.3.2",
+  "author": "Kilian Brendel",
   "main": "src/index.tsx",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/GR34SE/react-typescript-starter.git"
+  "bugs": {
+    "url": "https://github.com/kiber42/wordfinder/issues"
   },
-  "license": "MIT",
+  "keywords": ["game", "mobile", "friends", "React", "MySQL"],
   "scripts": {
     "develop": "webpack-cli serve --mode=development --env development --open --hot",
     "build": "webpack --mode=production --env production --progress",
@@ -49,11 +49,5 @@
     "query-string": "^8.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
-  },
-  "bugs": {
-    "url": "https://github.com/GR34SE/react-typescript-starter/issues"
-  },
-  "homepage": "https://github.com/GR34SE/react-typescript-starter#readme",
-  "keywords": [],
-  "author": ""
+  }
 }
