@@ -22,10 +22,7 @@ npm run build
 popd > /dev/null
 
 echo "Copying frontend and database script files to $target"
-
-for item in index.html static res; do
-    /bin/cp -r $path_to_react_project/build/$item $target
-done
+/bin/cp $path_to_react_project/build/* $target
 /bin/cp $path_to_database_scripts/*.php $target
 
 echo "Done."
