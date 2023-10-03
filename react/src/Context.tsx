@@ -1,3 +1,3 @@
-import React from 'react'
+import React from "react";
 
-export const Connection = React.createContext({token: 0})
+export const Connection = React.createContext({token: 0});
