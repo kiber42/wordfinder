@@ -1,6 +1,6 @@
 import React from "react";
 
-import {OtherWerewolves, IOtherWerewolvesProps, Role} from "./SecretRole"; // eslint-disable-line no-unused-vars
+import {OtherWerewolves, IOtherWerewolvesProps, Role} from "./SecretRole";
 
 interface IProps {
     mayor: string;

@@ -1,7 +1,7 @@
-import React from "react";
+import React, {useContext} from "react";
 
 import {Connection} from "./Context";
-import {OtherWerewolves, IOtherWerewolvesProps, Role} from "./SecretRole"; // eslint-disable-line no-unused-vars
+import {OtherWerewolves, IOtherWerewolvesProps, Role} from "./SecretRole";
 
 interface IProps {
     role: Role;
@@ -9,79 +9,76 @@ interface IProps {
     words?: string[];
 }
 
-export class MayorView extends React.Component<IProps & IOtherWerewolvesProps> {
-    context!: React.ContextType<typeof Connection>;
-
-    private getInstructions() {
-        let instructions: string;
-        switch (this.props.role) {
-            case "werewolf":
-                instructions =
-                    "Mache es den Ratern möglichst schwer, ohne dass sie dir auf die Schliche kommen!";
-                break;
-            case "seer":
-                instructions =
-                    "Mache es den Ratern möglichst einfach, ohne dass der Werwolf dich erkennt!";
-                break;
-            case "villager":
-                instructions = "Viel Erfolg!";
-                break;
-        }
+export function MayorView(props: IProps & IOtherWerewolvesProps) {
+    const connection = useContext(Connection);
+    if (props.words) {
+        const words = props.words.map((word, index) => (
+            <button onClick={() => choose_word(index, connection.token)} key={index}>
+                {word}
+            </button>
+        ));
         return (
-            <div className="instructions">
-                <div>
-                    Die anderen müssen das Wort erraten, aber du darfst nur mit <i>Ja</i>,{" "}
-                    <i>Nein</i> und <i>Vielleicht</i> antworten.
-                </div>
-                <div>{instructions}</div>
+            <div className="player-info">
+                <div className="instructions">Wähle dein Zauberwort:</div>
+                <div className="wordlist">{words}</div>
+                <OtherWerewolves other_werewolves={props.other_werewolves} />
             </div>
         );
     }
 
-    public render() {
-        if (this.props.words) {
-            const words = this.props.words.map((word, index) => (
-                <button onClick={() => this.choose_word(index)} key={index}>
-                    {word}
+    if (props.secret) {
+        return (
+            <div className="player-info">
+                <div className="secret-message">
+                    Das Zauberwort ist: <div className="secret">{props.secret}</div>
+                </div>
+                {getInstructions(props.role)}
+                <OtherWerewolves other_werewolves={props.other_werewolves} />
+                <button className="word-found" onClick={() => secret_found(connection.token)}>
+                    Das Wort wurde erraten!
                 </button>
-            ));
-            return (
-                <div className="player-info">
-                    <div className="instructions">Wähle dein Zauberwort:</div>
-                    <div className="wordlist">{words}</div>
-                    <OtherWerewolves other_werewolves={this.props.other_werewolves} />
-                </div>
-            );
-        }
-
-        if (this.props.secret) {
-            return (
-                <div className="player-info">
-                    <div className="secret-message">
-                        Das Zauberwort ist: <div className="secret">{this.props.secret}</div>
-                    </div>
-                    {this.getInstructions()}
-                    <OtherWerewolves other_werewolves={this.props.other_werewolves} />
-                    <button className="word-found" onClick={() => this.secret_found()}>
-                        Das Wort wurde erraten!
-                    </button>
-                </div>
-            );
-        }
-
-        console.error("No words available");
-        return <div>Fehler!</div>;
+            </div>
+        );
     }
 
-    choose_word(index: number) {
-        fetch("choose.php?token=" + this.context.token + "&index=" + index)
-            .then()
-            .catch((err) => console.error(err));
-    }
+    console.error("No words available");
+    return <div>Fehler!</div>;
+}
 
-    secret_found() {
-        fetch("found.php?token=" + this.context.token)
-            .then()
-            .catch((err) => console.error(err));
+function getInstructions(role: Role) {
+    let instructions: string;
+    switch (role) {
+        case "werewolf":
+            instructions =
+                "Mache es den Ratern möglichst schwer, ohne dass sie dir auf die Schliche kommen!";
+            break;
+        case "seer":
+            instructions =
+                "Mache es den Ratern möglichst einfach, ohne dass der Werwolf dich erkennt!";
+            break;
+        case "villager":
+            instructions = "Viel Erfolg!";
+            break;
     }
+    return (
+        <div className="instructions">
+            <div>
+                Die anderen müssen das Wort erraten, aber du darfst nur mit <i>Ja</i>, <i>Nein</i>{" "}
+                und <i>Vielleicht</i> antworten.
+            </div>
+            <div>{instructions}</div>
+        </div>
+    );
+}
+
+function choose_word(index: number, token: number) {
+    fetch("choose.php?token=" + token + "&index=" + index)
+        .then()
+        .catch((err) => console.error(err));
+}
+
+function secret_found(token: number) {
+    fetch("found.php?token=" + token)
+        .then()
+        .catch((err) => console.error(err));
 }

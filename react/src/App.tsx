@@ -8,7 +8,7 @@ import {GameView} from "./GameView";
 import {LobbyView} from "./Lobby";
 import {Login} from "./Login";
 import {ResultView} from "./Results";
-import {Role} from "./SecretRole"; // eslint-disable-line no-unused-vars
+import {Role} from "./SecretRole";
 import {Team} from "./Team";
 import {WaitView} from "./WaitView";
 

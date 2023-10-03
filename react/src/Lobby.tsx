@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {useContext} from "react";
 import copy from "copy-to-clipboard";
 
 import {Connection} from "./Context";
@@ -11,54 +11,42 @@ interface LobbyViewProps {
     num_werewolves: number;
 }
 
-export class LobbyView extends Component<LobbyViewProps> {
-    context!: React.ContextType<typeof Connection>;
-
-    render() {
-        let startButton;
-        if (this.props.num_players >= 3)
-            startButton = (
-                <button onClick={() => this.startGame()}>Alle da? Los geht&apos;s!</button>
-            );
-        else startButton = <button disabled>Warte auf Mitspieler...</button>;
-        return (
-            <>
-                <div className="startbutton">{startButton}</div>
-                <div className="settings-container">
-                    <Difficulty current={this.props.difficulty} />
-                    <NumWerewolves
-                        current={this.props.num_werewolves}
-                        num_players={this.props.num_players}
-                    />
-                </div>
-                <Invite link={this.props.invite_link} />
-            </>
+export function LobbyView(props: LobbyViewProps) {
+    const connection = useContext(Connection);
+    let startButton;
+    if (props.num_players >= 3)
+        startButton = (
+            <button onClick={() => startGame(connection.token)}>Alle da? Los geht&apos;s!</button>
         );
-    }
-
-    startGame() {
-        fetch("start.php?token=" + this.context.token)
-            .then()
-            .catch((err) => console.error(err));
-    }
-}
-
-interface InviteProps {
-    link: string;
-}
-
-class Invite extends Component<InviteProps> {
-    render() {
-        return (
-            <div className="invite-link-container">
-                <div className="invite-link-message">
-                    Mit diesem Link kannst du weitere Spieler einladen:
-                </div>
-                <div className="invite-link">
-                    <input type="text" id="link" value={this.props.link} readOnly />
-                    <button onClick={() => copy(this.props.link)}>📋</button>
-                </div>
+    else startButton = <button disabled>Warte auf Mitspieler...</button>;
+    return (
+        <>
+            <div className="startbutton">{startButton}</div>
+            <div className="settings-container">
+                <Difficulty current={props.difficulty} />
+                <NumWerewolves current={props.num_werewolves} num_players={props.num_players} />
             </div>
-        );
-    }
+            <Invite link={props.invite_link} />
+        </>
+    );
+}
+
+function startGame(token: number) {
+    fetch("start.php?token=" + token)
+        .then()
+        .catch((err) => console.error(err));
+}
+
+function Invite(props: {link: string}) {
+    return (
+        <div className="invite-link-container">
+            <div className="invite-link-message">
+                Mit diesem Link kannst du weitere Spieler einladen:
+            </div>
+            <div className="invite-link">
+                <input type="text" id="link" value={props.link} readOnly />
+                <button onClick={() => copy(props.link)}>📋</button>
+            </div>
+        </div>
+    );
 }

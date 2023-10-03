@@ -2,7 +2,7 @@ import React from "react";
 
 import {GuessingView} from "./GuessingView";
 import {MayorView} from "./MayorView";
-import {Role, SecretRoleCard} from "./SecretRole"; // eslint-disable-line no-unused-vars
+import {Role, SecretRoleCard} from "./SecretRole";
 import {VoteView} from "./Voting";
 
 interface IGameProps {
